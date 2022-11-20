@@ -2,7 +2,7 @@ import { MetadataHelper, ModuleConstructor, moduleMetadataKey } from './deps.ts'
 import { Swagger } from './swagger.ts';
 import Schema = Swagger.Schema;
 import Path = Swagger.Path;
-import { MethodDefiner } from './methodDefiner.ts';
+import { MethodDefiner } from './method-definer.ts';
 
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
