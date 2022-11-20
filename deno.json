@@ -1,0 +1,29 @@
+{
+	"lint": {
+		"files": {
+			"include": ["src/"],
+			"exclude": ["node_modules/"]
+		},
+		"rules": {
+			"tags": ["recommended"],
+			"include": ["ban-untagged-todo"],
+			"exclude": ["no-unused-vars"]
+		}
+	},
+	"fmt": {
+		"options": {
+			"singleQuote": true,
+			"useTabs": true
+		},
+		"files": {
+			"exclude": ["./node_modules/", "./coverage/", "./doc/"]
+		}
+	},
+	"compilerOptions": {
+		"emitDecoratorMetadata": true
+	},
+	"tasks": {
+		"test": "NO_LOG=true deno test --allow-env --allow-net --unstable -A spec",
+		"test:watch": "NO_LOG=true deno test --watch --allow-env --allow-net --unstable -A spec"
+	}
+}

@@ -1,0 +1,18 @@
+import { MetadataHelper } from 'https://deno.land/x/danet@1.2.0/src/metadata/helper.ts';
+
+export const ApiProperty = () => (
+  // deno-lint-ignore ban-types
+  target: Object,
+  propertyKey: string | symbol,
+) => {
+};
+
+export const RETURNED_TYPE_KEY = 'returntype';
+
+export const ReturnedType = (returnedType: unknown) => (
+  target: Object,
+  propertyKey: string | symbol,
+  descriptor: any
+) => {
+  MetadataHelper.setMetadata(RETURNED_TYPE_KEY, returnedType, target, propertyKey);
+}
