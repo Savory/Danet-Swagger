@@ -207,4 +207,8 @@ Deno.test("Generate a module open api definition", async (ctx) => {
     assertEquals(moduleDefinition.paths, controllerExpectedPaths);
   })
 
+  await ctx.step('create all schema from controllers', () => {
+    assertEquals(moduleDefinition.schemas, expectedSchemas);
+  })
+
 });
