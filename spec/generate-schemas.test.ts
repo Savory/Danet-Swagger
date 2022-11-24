@@ -1,4 +1,4 @@
-import { Controller, Get, Module, Patch, Post, Put, Body } from '../deps.ts';
+import { Controller, Get, Module, Patch, Post, Put, Body, Param } from '../deps.ts';
 import { assertEquals } from './test_deps.ts';
 import { SwaggerModule } from '../mod.ts';
 import { ApiProperty, BodyType, ReturnedType } from '../decorators.ts';
@@ -69,12 +69,18 @@ class SecondController {
   getSecond() {
     return;
   }
+
+  @Get(':id/:name')
+  getSomethingByIdAndName(@Param('id') id: string) {
+
+  }
 }
 
 @Module({
-  controllers: [MyController, SecondController],
+  controllers: [ MyController, SecondController ],
 })
-class MyModule {}
+class MyModule {
+}
 
 const swaggerModule = new SwaggerModule();
 
@@ -88,7 +94,7 @@ const controllerExpectedPaths: { [key: string]: Path } = {
           content: {
             'application/json': {
               schema: {
-                "$ref": "#/components/schemas/Cat"
+                '$ref': '#/components/schemas/Cat'
               },
             },
           },
@@ -97,16 +103,16 @@ const controllerExpectedPaths: { [key: string]: Path } = {
     },
     post: {
       operationId: 'postSomething',
-      "requestBody": {
-        "description": "",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Todo"
+      'requestBody': {
+        'description': '',
+        'content': {
+          'application/json': {
+            'schema': {
+              '$ref': '#/components/schemas/Todo'
             }
           },
         },
-        "required": true
+        'required': true
       },
       responses: {
         200: {
@@ -126,16 +132,16 @@ const controllerExpectedPaths: { [key: string]: Path } = {
     },
     put: {
       operationId: 'putSomething',
-      "requestBody": {
-        "description": "",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Todo"
+      'requestBody': {
+        'description': '',
+        'content': {
+          'application/json': {
+            'schema': {
+              '$ref': '#/components/schemas/Todo'
             }
           },
         },
-        "required": true
+        'required': true
       },
       responses: {
         200: {
@@ -153,10 +159,39 @@ const controllerExpectedPaths: { [key: string]: Path } = {
         },
       },
     }
+  },
+  '/second-endpoint/{id}/{name}': {
+    get: {
+      operationId: 'getSomethingByIdAndName',
+      responses: {
+        200: {
+          description: ''
+        },
+      },
+      parameters: [ {
+        'name': 'id',
+        'in': 'query',
+        'description': '',
+        'required': true,
+        'type': 'string',
+        'schema': {
+          'type': 'string',
+        },
+      }, {
+          'name': 'name',
+          'in': 'query',
+          'description': '',
+          'required': true,
+          'type': 'string',
+          'schema': {
+            'type': 'string',
+          },
+        } ]
+    }
   }
 };
 
-const expectedSchemas: {[key: string]: Schema} = {
+const expectedSchemas: { [key: string]: Schema } = {
   Todo: {
     properties: {
       title: {
@@ -169,7 +204,7 @@ const expectedSchemas: {[key: string]: Schema} = {
         type: 'number'
       },
       cat: {
-        "$ref": "#/components/schemas/Cat"
+        '$ref': '#/components/schemas/Cat'
       }
     }
   },
@@ -185,19 +220,19 @@ const expectedSchemas: {[key: string]: Schema} = {
   },
 };
 
-Deno.test("Generate a module open api definition", async (ctx) => {
-    const moduleDefinition = await swaggerModule.generateModuleDefinition(MyModule);
+Deno.test('Generate a module open api definition', async (ctx) => {
+  const moduleDefinition = await swaggerModule.generateModuleDefinition(MyModule);
 
   await ctx.step('create schemas for returned type', () => {
     assertEquals((moduleDefinition.schemas as any).Todo, expectedSchemas.Todo);
   })
 
   await ctx.step('create requestBody from @Body decorator', () => {
-    assertEquals(moduleDefinition.paths['/my-endpoint'].post, controllerExpectedPaths[ '/my-endpoint'].post);
+    assertEquals(moduleDefinition.paths['/my-endpoint'].post, controllerExpectedPaths['/my-endpoint'].post);
   })
 
   await ctx.step('create requestBody from @BodyType decorator', () => {
-    assertEquals(moduleDefinition.paths['/my-endpoint/somethingagain'].put, controllerExpectedPaths[ '/my-endpoint/somethingagain'].put);
+    assertEquals(moduleDefinition.paths['/my-endpoint/somethingagain'].put, controllerExpectedPaths['/my-endpoint/somethingagain'].put);
   })
 
   await ctx.step('Does not create responses content if there is none', () => {

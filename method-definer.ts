@@ -9,26 +9,30 @@ import DataType = Swagger.DataType;
 import Path = Swagger.Path;
 import Operation = Swagger.Operation;
 import Schema = Swagger.Schema;
+import { pathToRegexp } from './deps.ts';
 
 export class MethodDefiner {
 
   private pathKey: string;
   private readonly httpMethod: keyof Path;
-  private urlPath: string;
   private readonly pathUrl: string;
+  private pathTokens: pathToRegexp.Token[] = [];
+  private containsUrlParams = false;
 
   constructor(private Controller: Constructor, private methodName: string) {
     this.pathKey = trimSlash(MetadataHelper.getMetadata<string>('endpoint', Controller));
     this.httpMethod = MetadataHelper.getMetadata<string>('method', Controller.prototype[methodName]).toLowerCase() as keyof Path;
-    this.urlPath = trimSlash(MetadataHelper.getMetadata<string>('endpoint', Controller.prototype[methodName]));
-    this.pathUrl = this.urlPath ? `/${this.pathKey}/${this.urlPath}` : `/${this.pathKey}`;
+    const urlPath = trimSlash(MetadataHelper.getMetadata<string>('endpoint', Controller.prototype[methodName]));
+    this.pathUrl = urlPath ? `/${this.pathKey}/${urlPath}` : `/${this.pathKey}`;
+    this.pathUrl = this.getPathTokenAndTransformUrl(this.pathUrl);
   }
 
 
   public addMethodDefinitionToActual(paths: { [p: string]: Path }, schemas : { [p:string] : Schema}) {
-    paths = this.addActualMethodToPath(paths)
+    paths = this.addActualMethodPath(paths)
     let actualPath = (paths[this.pathUrl][this.httpMethod] as Operation);
-    const responseSchema = this.createResponseAndSchemaFromReturnType(actualPath);
+    this.addUrlParams(actualPath);
+    const responseSchema = this.addResponseAndGetSchema(actualPath);
     const bodySchema = this.addRequestBodyAndGetSchema(actualPath);
     schemas = {
       ...schemas,
@@ -41,7 +45,39 @@ export class MethodDefiner {
       paths};
   }
 
-  private addActualMethodToPath(paths: { [p: string]: Path }) {
+  private addUrlParams(actualPath: Operation) {
+    if (this.containsUrlParams && !actualPath.parameters)
+      actualPath.parameters = [];
+    for (const item of this.pathTokens) {
+      if (typeof item === 'string') continue;
+      actualPath.parameters!.push({
+        name: `${item.name}`,
+        in: 'query',
+        description: '',
+        required: true,
+        type: 'string',
+        schema: {
+          type: 'string',
+        }
+      });
+    }
+  }
+
+  private getPathTokenAndTransformUrl(urlPath: string) {
+    let pathWithParams = '';
+    this.pathTokens = pathToRegexp.parse(urlPath);
+    for (const item of this.pathTokens) {
+      if (typeof item === "string")
+        pathWithParams += item;
+      else {
+        this.containsUrlParams = true;
+        pathWithParams += `${item.prefix}{${item.name}}`;
+      }
+    }
+    return pathWithParams;
+  }
+
+  private addActualMethodPath(paths: { [p: string]: Path }) {
     return {
       ...paths,
       [this.pathUrl]: {
@@ -58,7 +94,7 @@ export class MethodDefiner {
     };
   }
 
-  private createResponseAndSchemaFromReturnType(actualPath: Operation) {
+  private addResponseAndGetSchema(actualPath: Operation) {
     const returnedValue = MetadataHelper.getMetadata(RETURNED_TYPE_KEY, this.Controller.prototype, this.methodName) as Constructor;
     if (returnedValue) {
       const returnedValueSchema = this.generateTypeSchema(returnedValue);
