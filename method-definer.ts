@@ -94,9 +94,15 @@ export class MethodDefiner {
     Object.getOwnPropertyNames(emptyInstance).forEach((propertyName) => {
       if (schema && schema[name] && schema[name].properties) {
         let typeFunction = MetadataHelper.getMetadata('design:type', Type.prototype, propertyName) as Function;
-        const propertyType = typeFunction.name.toLowerCase() as DataType;
-        schema![name]!.properties![propertyName] = {
-          type: propertyType
+        const propertyType = typeFunction.name;
+        if (['string', 'number'].includes(propertyType.toLowerCase())) {
+          schema![name]!.properties![propertyName] = {
+            type: propertyType.toLowerCase() as DataType
+          }
+        } else {
+          schema![name]!.properties![propertyName] = {
+            $ref: `#/components/schemas/${propertyType}`
+          }
         }
       }
     });

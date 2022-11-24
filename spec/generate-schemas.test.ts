@@ -6,19 +6,6 @@ import { Swagger } from '../swagger.ts';
 import Schema = Swagger.Schema;
 import Path = Swagger.Path;
 
-class Todo {
-  @ApiProperty()
-  title!: string;
-
-  @ApiProperty()
-  description!: string;
-
-  @ApiProperty()
-  version!: number;
-
-  constructor() {
-  }
-}
 
 class Cat {
   @ApiProperty()
@@ -30,6 +17,24 @@ class Cat {
   constructor() {
   }
 }
+
+class Todo {
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty()
+  description!: string;
+
+  @ApiProperty()
+  version!: number;
+
+  @ApiProperty()
+  cat!: Cat;
+
+  constructor() {
+  }
+}
+
 
 @Controller('my-endpoint')
 class MyController {
@@ -162,6 +167,9 @@ const expectedSchemas: {[key: string]: Schema} = {
       },
       version: {
         type: 'number'
+      },
+      cat: {
+        "$ref": "#/components/schemas/Cat"
       }
     }
   },
