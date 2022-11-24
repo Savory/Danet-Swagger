@@ -1,7 +1,7 @@
-import { Controller, Get, Module, Patch, Post, Put, Body, Param } from '../deps.ts';
+import { Controller, Get, Module, Patch, Post, Put, Body, Param, Query } from '../deps.ts';
 import { assertEquals } from './test_deps.ts';
 import { SwaggerModule } from '../mod.ts';
-import { ApiProperty, BodyType, ReturnedType } from '../decorators.ts';
+import { ApiProperty, BodyType, Optional, QueryType, ReturnedType } from '../decorators.ts';
 import { Swagger } from '../swagger.ts';
 import Schema = Swagger.Schema;
 import Path = Swagger.Path;
@@ -17,6 +17,25 @@ class Cat {
   constructor() {
   }
 }
+
+
+class CatSearch {
+  @ApiProperty()
+  name: string;
+
+  @Optional()
+  @ApiProperty()
+  breed?: string;
+
+  @Optional()
+  @ApiProperty()
+  age?: number;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
 
 class Todo {
   @ApiProperty()
@@ -40,6 +59,7 @@ class Todo {
 class MyController {
 
   @ReturnedType(Cat)
+  @QueryType(CatSearch)
   @Get()
   getSomething(): Cat {
     return new Cat();
@@ -88,6 +108,36 @@ const controllerExpectedPaths: { [key: string]: Path } = {
   '/my-endpoint': {
     get: {
       operationId: 'getSomething',
+      parameters: [ {
+        'name': 'name',
+        'in': 'query',
+        'description': '',
+        'required': true,
+        'type': 'string',
+        'schema': {
+          'type': 'string',
+        },
+      },
+        {
+          'name': 'breed',
+          'in': 'query',
+          'description': '',
+          'required': false,
+          'type': 'string',
+          'schema': {
+            'type': 'string',
+          },
+        },
+        {
+          'name': 'age',
+          'in': 'query',
+          'description': '',
+          'required': false,
+          'type': 'number',
+          'schema': {
+            'type': 'number',
+          },
+        }],
       responses: {
         200: {
           description: '',
@@ -170,7 +220,7 @@ const controllerExpectedPaths: { [key: string]: Path } = {
       },
       parameters: [ {
         'name': 'id',
-        'in': 'query',
+        'in': 'path',
         'description': '',
         'required': true,
         'type': 'string',
@@ -179,7 +229,7 @@ const controllerExpectedPaths: { [key: string]: Path } = {
         },
       }, {
           'name': 'name',
-          'in': 'query',
+          'in': 'path',
           'description': '',
           'required': true,
           'type': 'string',
@@ -215,6 +265,19 @@ const expectedSchemas: { [key: string]: Schema } = {
       },
       breed: {
         type: 'string'
+      }
+    }
+  },
+  CatSearch: {
+    properties: {
+      name: {
+        type: 'string'
+      },
+      breed: {
+        type: 'string'
+      },
+      age: {
+        type: 'number'
       }
     }
   },

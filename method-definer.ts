@@ -2,14 +2,15 @@ import { Swagger } from './swagger.ts';
 import { Constructor } from './mod.ts';
 import { trimSlash } from '../Danet/src/router/utils.ts';
 import { MetadataHelper } from '../Danet/src/metadata/helper.ts';
-import { RETURNED_TYPE_KEY } from './decorators.ts';
+import { OPTIONAL_KEY, RETURNED_TYPE_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
-import { BODY_TYPE_KEY } from '../Danet/src/router/controller/params/decorators.ts';
+import { BODY_TYPE_KEY, QUERY_TYPE_KEY } from '../Danet/src/router/controller/params/decorators.ts';
 import DataType = Swagger.DataType;
 import Path = Swagger.Path;
 import Operation = Swagger.Operation;
 import Schema = Swagger.Schema;
 import { pathToRegexp } from './deps.ts';
+import Parameter = Swagger.Parameter;
 
 export class MethodDefiner {
 
@@ -18,7 +19,7 @@ export class MethodDefiner {
   private readonly pathUrl: string;
   private pathTokens: pathToRegexp.Token[] = [];
   private containsUrlParams = false;
-
+  private schemas : {[key: string]: Schema} = {};
   constructor(private Controller: Constructor, private methodName: string) {
     this.pathKey = trimSlash(MetadataHelper.getMetadata<string>('endpoint', Controller));
     this.httpMethod = MetadataHelper.getMetadata<string>('method', Controller.prototype[methodName]).toLowerCase() as keyof Path;
@@ -32,12 +33,12 @@ export class MethodDefiner {
     paths = this.addActualMethodPath(paths)
     let actualPath = (paths[this.pathUrl][this.httpMethod] as Operation);
     this.addUrlParams(actualPath);
-    const responseSchema = this.addResponseAndGetSchema(actualPath);
-    const bodySchema = this.addRequestBodyAndGetSchema(actualPath);
+    this.addQueryParams(actualPath);
+    this.addResponse(actualPath);
+    this.addRequestBody(actualPath);
     schemas = {
       ...schemas,
-      ...responseSchema,
-      ...bodySchema,
+      ...this.schemas,
     }
 
     return {
@@ -52,7 +53,7 @@ export class MethodDefiner {
       if (typeof item === 'string') continue;
       actualPath.parameters!.push({
         name: `${item.name}`,
-        in: 'query',
+        in: 'path',
         description: '',
         required: true,
         type: 'string',
@@ -60,6 +61,41 @@ export class MethodDefiner {
           type: 'string',
         }
       });
+    }
+  }
+
+  private addQueryParams(actualPath: Operation) {
+    const queryType = MetadataHelper.getMetadata(QUERY_TYPE_KEY, this.Controller.prototype, this.methodName) as Constructor;
+    if (queryType) {
+      if (!actualPath.parameters)
+        actualPath.parameters = [];
+      this.generateTypeSchema(queryType);
+      const emptyInstance = Reflect.construct(queryType, []);
+      Object.getOwnPropertyNames(emptyInstance).forEach((propertyName) => {
+        const typeFunction = MetadataHelper.getMetadata('design:type', queryType.prototype, propertyName) as Constructor<any>;
+        const isOptional = !MetadataHelper.getMetadata(OPTIONAL_KEY, queryType.prototype, propertyName) as boolean;
+        const propertyType = typeFunction;
+        const propertyTypeName = propertyType.name;
+        const paramToAdd: Partial<Parameter> = {
+          name: `${propertyName}`,
+          in: 'query',
+          description: '',
+          required: isOptional,
+        };
+        if (['string', 'number'].includes(propertyTypeName.toLowerCase())) {
+          paramToAdd.type = propertyTypeName.toLowerCase() as DataType;
+          paramToAdd.schema = {
+            type: propertyTypeName.toLowerCase() as DataType,
+          }
+        } else {
+          this.generateTypeSchema(propertyType);
+          paramToAdd.type = 'object';
+          paramToAdd.schema = {
+            $ref: `#/components/schemas/${propertyTypeName}`
+          }
+        }
+        actualPath.parameters!.push(paramToAdd as Parameter);
+      })
     }
   }
 
@@ -94,23 +130,22 @@ export class MethodDefiner {
     };
   }
 
-  private addResponseAndGetSchema(actualPath: Operation) {
+  private addResponse(actualPath: Operation) {
     const returnedValue = MetadataHelper.getMetadata(RETURNED_TYPE_KEY, this.Controller.prototype, this.methodName) as Constructor;
     if (returnedValue) {
-      const returnedValueSchema = this.generateTypeSchema(returnedValue);
+      this.generateTypeSchema(returnedValue);
       actualPath.responses[200] = new ResponseBuilder().jsonContent(  {
         '$ref': `#/components/schemas/${returnedValue.name}`,
       }).setDescription('').get();
-      return returnedValueSchema;
     }
     return null;
   }
 
-  private addRequestBodyAndGetSchema(actualPath: Operation) {
+  private addRequestBody(actualPath: Operation) {
     const bodyType = MetadataHelper.getMetadata(BODY_TYPE_KEY, this.Controller.prototype, this.methodName) as Constructor;
     if (bodyType) {
       actualPath.requestBody = new RequestBodyBuilder().jsonContent({'$ref': `#/components/schemas/${bodyType.name}`}).setDescription('').get();
-      return this.generateTypeSchema(bodyType);
+      this.generateTypeSchema(bodyType);
     }
     return null;
   }
@@ -143,6 +178,9 @@ export class MethodDefiner {
       }
     });
 
-    return schema;
+    this.schemas = {
+      ...this.schemas,
+      ...schema,
+    }
   }
 }
