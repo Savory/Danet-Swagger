@@ -16,7 +16,7 @@ import {
 	BodyType,
 	Optional,
 	QueryType,
-	ReturnedType,
+	ReturnedType, Tag,
 } from '../decorators.ts';
 import { Swagger } from '../swagger.ts';
 import Schema = Swagger.Schema;
@@ -93,6 +93,7 @@ class MyController {
 	}
 }
 
+@Tag('second')
 @Controller('second-endpoint')
 class SecondController {
 	@Get()
@@ -100,6 +101,7 @@ class SecondController {
 		return;
 	}
 
+	@Tag('third')
 	@Get(':id/:name')
 	getSomethingByIdAndName(@Param('id') id: string) {
 	}
@@ -209,6 +211,9 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 	},
 	'/second-endpoint': {
 		get: {
+			"tags": [
+				"second"
+			],
 			operationId: 'getSecond',
 			responses: {
 				200: {
@@ -219,6 +224,10 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 	},
 	'/second-endpoint/{id}/{name}': {
 		get: {
+			"tags": [
+				"second",
+				"third"
+			],
 			operationId: 'getSomethingByIdAndName',
 			responses: {
 				200: {
@@ -314,12 +323,9 @@ Deno.test('Generate a module open api definition', async (ctx) => {
 	});
 
 	await ctx.step('Does not create responses content if there is none', () => {
-		assertEquals(moduleDefinition.paths['/second-endpoint'].get, {
-			operationId: 'getSecond',
-			responses: {
-				200: {
-					description: '',
-				},
+		assertEquals(moduleDefinition.paths['/second-endpoint'].get?.responses, {
+			200: {
+				description: '',
 			},
 		});
 	});

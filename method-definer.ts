@@ -2,7 +2,7 @@ import { Swagger } from './swagger.ts';
 import { Constructor } from './mod.ts';
 import { trimSlash } from '../Danet/src/router/utils.ts';
 import { MetadataHelper } from '../Danet/src/metadata/helper.ts';
-import { OPTIONAL_KEY, RETURNED_TYPE_KEY } from './decorators.ts';
+import { OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
 import {
 	BODY_TYPE_KEY,
@@ -45,7 +45,8 @@ export class MethodDefiner {
 		schemas: { [p: string]: Schema },
 	) {
 		paths = this.addActualMethodPath(paths);
-		let actualPath = (paths[this.pathUrl][this.httpMethod] as Operation);
+		const actualPath = (paths[this.pathUrl][this.httpMethod] as Operation);
+		this.addTags(actualPath);
 		this.addUrlParams(actualPath);
 		this.addQueryParams(actualPath);
 		this.addResponse(actualPath);
@@ -59,6 +60,14 @@ export class MethodDefiner {
 			schemas,
 			paths,
 		};
+	}
+
+	private addTags(actuaPath: Operation) {
+		const controllerTag = MetadataHelper.getMetadata<string>(TAGS_KEY, this.Controller);
+		const methodTag = MetadataHelper.getMetadata<string>(TAGS_KEY, this.Controller.prototype, this.methodName);
+		if (controllerTag || methodTag) {
+			actuaPath.tags = [ controllerTag, methodTag ].filter(t => !!t);
+		}
 	}
 
 	private addUrlParams(actualPath: Operation) {

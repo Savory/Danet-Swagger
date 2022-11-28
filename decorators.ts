@@ -51,3 +51,17 @@ export const QueryType = (type: Constructor) =>
 ) => {
 	MetadataHelper.setMetadata(QUERY_TYPE_KEY, type, target, propertyKey);
 };
+
+export const TAGS_KEY = 'tags';
+
+export const Tag = (tagName: string) =>
+	(
+		target: Object,
+		propertyKey?: string | symbol,
+		descriptor?: PropertyDescriptor,
+	) => {
+	if (propertyKey)
+		MetadataHelper.setMetadata(TAGS_KEY, tagName, target, propertyKey);
+	else
+		MetadataHelper.setMetadata(TAGS_KEY, tagName, target);
+	};
