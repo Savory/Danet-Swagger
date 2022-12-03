@@ -29,11 +29,14 @@ export namespace Swagger {
 		info: Info;
 		tags?: Tag[];
 		externalDocs?: ExternalDocs;
-		openapi: '3.0.0';
+		openapi: '3.0.3';
 		servers: Server[];
 		components: Components;
 		paths: { [name: string]: Path };
+		security?: SecurityRequirementObject
 	}
+
+	export type SecurityRequirementObject = Record<string, string[]>;
 
 	export interface Components {
 		callbacks?: { [name: string]: unknown };
@@ -44,11 +47,19 @@ export namespace Swagger {
 		requestBodies?: { [name: string]: unknown };
 		responses?: { [name: string]: Response };
 		schemas?: { [name: string]: Schema };
-		securitySchemes?: { [name: string]: SecuritySchemes };
+		securitySchemes?: { [name: string]: SecurityScheme };
 	}
 
 	export interface Server {
 		url: string;
+		description?: string;
+		variables?: Record<string, ServerVariable>;
+	}
+
+	export interface ServerVariable {
+		enum?: string[] | boolean[] | number[];
+		default: string | boolean | number;
+		description?: string;
 	}
 
 	export interface Info {
@@ -96,7 +107,6 @@ export namespace Swagger {
 		example?: unknown;
 		examples?: { [name: string]: Example | string };
 		schema: Schema;
-		type: DataType;
 		format?: DataFormat;
 		deprecated?: boolean;
 	}
@@ -160,7 +170,7 @@ export namespace Swagger {
 		responses: { [name: string]: Response };
 		schemes?: Protocol[];
 		deprecated?: boolean;
-		security?: Security[];
+		security?: SecurityRequirementObject[];
 		requestBody?: RequestBody;
 
 		[ext: `x-${string}`]: unknown;
@@ -248,84 +258,32 @@ export namespace Swagger {
 		wrapped?: boolean;
 	}
 
-	interface BaseSecurity {
+	export type SecuritySchemeType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
+
+	export interface SecurityScheme {
+		type: SecuritySchemeType;
 		description?: string;
+		name?: string;
+		in?: string;
+		scheme?: string;
+		bearerFormat?: string;
+		flows?: OAuthFlows;
+		openIdConnectUrl?: string;
 	}
 
-	interface BaseOAuthSecurity extends BaseSecurity {
-		scopes?: OAuthScope;
+	export interface OAuthFlows {
+		implicit?: OAuthFlow;
+		password?: OAuthFlow;
+		clientCredentials?: OAuthFlow;
+		authorizationCode?: OAuthFlow;
 	}
 
-	export interface BasicSecurity extends BaseSecurity {
-		type: 'http';
-		scheme: 'basic';
-	}
-
-	export interface ApiKeySecurity extends BaseSecurity {
-		type: 'apiKey';
-		name: string;
-		in: 'query' | 'header';
-	}
-
-	export interface OAuth2Security3 extends BaseSecurity {
-		type: 'oauth2';
-		flows: OAuthFlow;
-	}
-
-	export interface OAuth2SecurityFlow3 extends BaseSecurity {
-		tokenUrl?: string;
+	export interface OAuthFlow {
 		authorizationUrl?: string;
-		scopes?: OAuthScope;
+		tokenUrl?: string;
+		refreshUrl?: string;
+		scopes: ScopesObject;
 	}
 
-	export interface OAuth2ImplicitSecurity extends BaseOAuthSecurity {
-		type: 'oauth2';
-		description?: string;
-		flow: 'implicit';
-		authorizationUrl: string;
-	}
-
-	export interface OAuth2PasswordSecurity extends BaseOAuthSecurity {
-		type: 'oauth2';
-		flow: 'password';
-		tokenUrl: string;
-	}
-
-	export interface OAuth2ApplicationSecurity extends BaseOAuthSecurity {
-		type: 'oauth2';
-		flow: 'application';
-		tokenUrl: string;
-	}
-
-	export interface OAuth2AccessCodeSecurity extends BaseOAuthSecurity {
-		type: 'oauth2';
-		flow: 'accessCode';
-		tokenUrl: string;
-		authorizationUrl: string;
-	}
-
-	export interface OAuthScope {
-		[scopeName: string]: string;
-	}
-
-	export type OAuthFlow = {
-		[flowName in OAuth2FlowTypes]?: OAuth2SecurityFlow3;
-	};
-	export type OAuth2FlowTypes =
-		| 'authorizationCode'
-		| 'implicit'
-		| 'password'
-		| 'clientCredentials';
-	export type SecuritySchemes =
-		| BasicSecurity
-		| BasicSecurity
-		| ApiKeySecurity
-		| OAuth2AccessCodeSecurity
-		| OAuth2ApplicationSecurity
-		| OAuth2ImplicitSecurity
-		| OAuth2PasswordSecurity
-		| OAuth2Security3;
-	export interface Security {
-		[key: string]: string[];
-	}
+	export type ScopesObject = Record<string, any>;
 }

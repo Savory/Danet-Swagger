@@ -1,6 +1,6 @@
 import {
 	Body,
-	Controller,
+	Controller, DanetApplication,
 	Get,
 	Module,
 	Param,
@@ -19,6 +19,7 @@ import {
 	ReturnedType, Tag,
 } from '../decorators.ts';
 import { Swagger } from '../swagger.ts';
+import { SpecBuilder } from '../mod.ts';
 import Schema = Swagger.Schema;
 import Path = Swagger.Path;
 
@@ -108,12 +109,19 @@ class SecondController {
 }
 
 @Module({
-	controllers: [MyController, SecondController],
+	controllers: [SecondController],
+})
+class SecondModule {
+}
+
+@Module({
+	imports: [SecondModule],
+	controllers: [MyController],
 })
 class MyModule {
 }
 
-const swaggerModule = new SwaggerModule();
+
 
 const controllerExpectedPaths: { [key: string]: Path } = {
 	'/my-endpoint': {
@@ -124,7 +132,6 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 				'in': 'query',
 				'description': '',
 				'required': true,
-				'type': 'string',
 				'schema': {
 					'type': 'string',
 				},
@@ -133,7 +140,6 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 				'in': 'query',
 				'description': '',
 				'required': false,
-				'type': 'string',
 				'schema': {
 					'type': 'string',
 				},
@@ -142,7 +148,6 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 				'in': 'query',
 				'description': '',
 				'required': false,
-				'type': 'number',
 				'schema': {
 					'type': 'number',
 				},
@@ -239,7 +244,6 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 				'in': 'path',
 				'description': '',
 				'required': true,
-				'type': 'string',
 				'schema': {
 					'type': 'string',
 				},
@@ -248,7 +252,6 @@ const controllerExpectedPaths: { [key: string]: Path } = {
 				'in': 'path',
 				'description': '',
 				'required': true,
-				'type': 'string',
 				'schema': {
 					'type': 'string',
 				},
@@ -299,42 +302,35 @@ const expectedSchemas: { [key: string]: Schema } = {
 	},
 };
 
-Deno.test('Generate a module open api definition', async (ctx) => {
-	const moduleDefinition = await swaggerModule.generateModuleDefinition(
-		MyModule,
-	);
-
-	await ctx.step('create schemas for returned type', () => {
-		assertEquals((moduleDefinition.schemas as any).Todo, expectedSchemas.Todo);
-	});
-
-	await ctx.step('create requestBody from @Body decorator', () => {
-		assertEquals(
-			moduleDefinition.paths['/my-endpoint'].post,
-			controllerExpectedPaths['/my-endpoint'].post,
-		);
-	});
-
-	await ctx.step('create requestBody from @BodyType decorator', () => {
-		assertEquals(
-			moduleDefinition.paths['/my-endpoint/somethingagain'].put,
-			controllerExpectedPaths['/my-endpoint/somethingagain'].put,
-		);
-	});
-
-	await ctx.step('Does not create responses content if there is none', () => {
-		assertEquals(moduleDefinition.paths['/second-endpoint'].get?.responses, {
-			200: {
-				description: '',
-			},
-		});
-	});
-
-	await ctx.step('create paths from controllers', () => {
-		assertEquals(moduleDefinition.paths, controllerExpectedPaths);
-	});
-
-	await ctx.step('create all schema from controllers', () => {
-		assertEquals(moduleDefinition.schemas, expectedSchemas);
-	});
+Deno.test('Generate app definition', async () => {
+	const app = new DanetApplication();
+	await app.init(MyModule);
+	const title = 'Cats example';
+	const description = 'The cats API description';
+	const version = '1.0';
+	const tagName = 'cats';
+	const spec = new SpecBuilder()
+		.setTitle(title)
+		.setDescription(description)
+		.setVersion(version)
+		.addTag(tagName)
+		.build();
+	const document = await SwaggerModule.createDocument(app, spec) as any;
+	assertEquals(document, {
+		info: {
+			title: title,
+			description: description,
+			version: version
+		},
+		tags: [{
+			name: tagName,
+			description: ''
+		}],
+		servers: [],
+		openapi: '3.0.3',
+		components: {
+			schemas: expectedSchemas,
+		},
+		paths: controllerExpectedPaths,
+	})
 });

@@ -81,7 +81,6 @@ export class MethodDefiner {
 				in: 'path',
 				description: '',
 				required: true,
-				type: 'string',
 				schema: {
 					type: 'string',
 				},
@@ -121,13 +120,11 @@ export class MethodDefiner {
 					required: isOptional,
 				};
 				if (['string', 'number'].includes(propertyTypeName.toLowerCase())) {
-					paramToAdd.type = propertyTypeName.toLowerCase() as DataType;
 					paramToAdd.schema = {
 						type: propertyTypeName.toLowerCase() as DataType,
 					};
 				} else {
 					this.generateTypeSchema(propertyType);
-					paramToAdd.type = 'object';
 					paramToAdd.schema = {
 						$ref: `#/components/schemas/${propertyTypeName}`,
 					};

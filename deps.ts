@@ -14,6 +14,6 @@ export {
 	Query,
 	QUERY_TYPE_KEY,
 	trimSlash,
-} from 'https://deno.land/x/danet@1.2.2/mod.ts';
-export { MetadataHelper } from 'https://deno.land/x/danet@1.2.2/src/metadata/mod.ts';
+} from 'https://deno.land/x/danet@1.3.0/mod.ts';
+export { MetadataHelper } from 'https://deno.land/x/danet@1.3.0/src/metadata/mod.ts';
 export * as pathToRegexp from 'https://deno.land/x/path_to_regexp@v6.2.1/index.ts';
