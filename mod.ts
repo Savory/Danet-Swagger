@@ -2,7 +2,7 @@ import {
 	DanetApplication,
 	MetadataHelper,
 	ModuleConstructor,
-	moduleMetadataKey,
+	moduleMetadataKey, path,
 } from './deps.ts';
 import { Swagger } from './swagger.ts';
 import Schema = Swagger.Schema;
@@ -73,5 +73,15 @@ export class SwaggerModule {
 		return { paths, schemas };
 	}
 
+	static async setup(apiPath: string, app: DanetApplication, document: Swagger.Spec) {
+		const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
+		const filePath = `${__dirname}/swagger.html`;
+		const swaggerHtml = await Deno.readTextFile(filePath);
+		app.danetRouter.router.get(apiPath, async (context, next) => {
+			context.response.body = swaggerHtml;
+			await next();
+		});
+	}
 }
+
 export { SpecBuilder } from './builder.ts';

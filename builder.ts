@@ -241,8 +241,6 @@ export class SpecBuilder {
 	}
 
 	public build() {
-		return {
-			...this.spec,
-		}
+		return this.spec;
 	}
 }

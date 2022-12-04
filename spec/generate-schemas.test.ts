@@ -7,7 +7,7 @@ import {
 	Patch,
 	Post,
 	Put,
-	Query,
+	path,
 } from '../deps.ts';
 import { assertEquals } from './test_deps.ts';
 import { SwaggerModule } from '../mod.ts';
@@ -23,288 +23,288 @@ import { SpecBuilder } from '../mod.ts';
 import Schema = Swagger.Schema;
 import Path = Swagger.Path;
 
-class Cat {
-	@ApiProperty()
-	name!: string;
+Deno.test('Generate app definition', async () => {
 
-	@ApiProperty()
-	breed!: string;
+	class Cat {
+		@ApiProperty()
+		name!: string;
 
-	constructor() {
-	}
-}
+		@ApiProperty()
+		breed!: string;
 
-class CatSearch {
-	@ApiProperty()
-	name: string;
-
-	@Optional()
-	@ApiProperty()
-	breed?: string;
-
-	@Optional()
-	@ApiProperty()
-	age?: number;
-
-	constructor(name: string) {
-		this.name = name;
-	}
-}
-
-class Todo {
-	@ApiProperty()
-	title!: string;
-
-	@ApiProperty()
-	description!: string;
-
-	@ApiProperty()
-	version!: number;
-
-	@ApiProperty()
-	cat!: Cat;
-
-	constructor() {
-	}
-}
-
-@Controller('my-endpoint')
-class MyController {
-	@ReturnedType(Cat)
-	@QueryType(CatSearch)
-	@Get()
-	getSomething(): Cat {
-		return new Cat();
+		constructor() {
+		}
 	}
 
-	@Post()
-	postSomething(@Body() todo: Todo): number {
-		return 1;
+	class CatSearch {
+		@ApiProperty()
+		name: string;
+
+		@Optional()
+		@ApiProperty()
+		breed?: string;
+
+		@Optional()
+		@ApiProperty()
+		age?: number;
+
+		constructor(name: string) {
+			this.name = name;
+		}
 	}
 
-	@Patch('somethingagain')
-	patchSomething(): boolean {
-		return true;
+	class Todo {
+		@ApiProperty()
+		title!: string;
+
+		@ApiProperty()
+		description!: string;
+
+		@ApiProperty()
+		version!: number;
+
+		@ApiProperty()
+		cat!: Cat;
+
+		constructor() {
+		}
 	}
 
-	@BodyType(Todo)
-	@Put('somethingagain')
-	putSomething(): Todo {
-		return new Todo();
+	@Controller('my-endpoint')
+	class MyController {
+		@ReturnedType(Cat)
+		@QueryType(CatSearch)
+		@Get()
+		getSomething(): Cat {
+			return new Cat();
+		}
+
+		@Post()
+		postSomething(@Body() todo: Todo): number {
+			return 1;
+		}
+
+		@Patch('somethingagain')
+		patchSomething(): boolean {
+			return true;
+		}
+
+		@BodyType(Todo)
+		@Put('somethingagain')
+		putSomething(): Todo {
+			return new Todo();
+		}
 	}
-}
 
-@Tag('second')
-@Controller('second-endpoint')
-class SecondController {
-	@Get()
-	getSecond() {
-		return;
+	@Tag('second')
+	@Controller('second-endpoint')
+	class SecondController {
+		@Get()
+		getSecond() {
+			return;
+		}
+
+		@Tag('third')
+		@Get(':id/:name')
+		getSomethingByIdAndName(@Param('id') id: string) {
+		}
 	}
 
-	@Tag('third')
-	@Get(':id/:name')
-	getSomethingByIdAndName(@Param('id') id: string) {
+	@Module({
+		controllers: [SecondController],
+	})
+	class SecondModule {
 	}
-}
 
-@Module({
-	controllers: [SecondController],
-})
-class SecondModule {
-}
-
-@Module({
-	imports: [SecondModule],
-	controllers: [MyController],
-})
-class MyModule {
-}
+	@Module({
+		imports: [SecondModule],
+		controllers: [MyController],
+	})
+	class MyModule {
+	}
 
 
 
-const controllerExpectedPaths: { [key: string]: Path } = {
-	'/my-endpoint': {
-		get: {
-			operationId: 'getSomething',
-			parameters: [{
-				'name': 'name',
-				'in': 'query',
-				'description': '',
-				'required': true,
-				'schema': {
-					'type': 'string',
-				},
-			}, {
-				'name': 'breed',
-				'in': 'query',
-				'description': '',
-				'required': false,
-				'schema': {
-					'type': 'string',
-				},
-			}, {
-				'name': 'age',
-				'in': 'query',
-				'description': '',
-				'required': false,
-				'schema': {
-					'type': 'number',
-				},
-			}],
-			responses: {
-				200: {
-					description: '',
-					content: {
-						'application/json': {
-							schema: {
-								'$ref': '#/components/schemas/Cat',
+	const controllerExpectedPaths: { [key: string]: Path } = {
+		'/my-endpoint': {
+			get: {
+				operationId: 'getSomething',
+				parameters: [{
+					'name': 'name',
+					'in': 'query',
+					'description': '',
+					'required': true,
+					'schema': {
+						'type': 'string',
+					},
+				}, {
+					'name': 'breed',
+					'in': 'query',
+					'description': '',
+					'required': false,
+					'schema': {
+						'type': 'string',
+					},
+				}, {
+					'name': 'age',
+					'in': 'query',
+					'description': '',
+					'required': false,
+					'schema': {
+						'type': 'number',
+					},
+				}],
+				responses: {
+					200: {
+						description: '',
+						content: {
+							'application/json': {
+								schema: {
+									'$ref': '#/components/schemas/Cat',
+								},
 							},
 						},
 					},
 				},
 			},
-		},
-		post: {
-			operationId: 'postSomething',
-			'requestBody': {
-				'description': '',
-				'content': {
-					'application/json': {
-						'schema': {
-							'$ref': '#/components/schemas/Todo',
+			post: {
+				operationId: 'postSomething',
+				'requestBody': {
+					'description': '',
+					'content': {
+						'application/json': {
+							'schema': {
+								'$ref': '#/components/schemas/Todo',
+							},
 						},
 					},
+					'required': true,
 				},
-				'required': true,
-			},
-			responses: {
-				200: {
-					description: '',
-				},
-			},
-		},
-	},
-	'/my-endpoint/somethingagain': {
-		patch: {
-			operationId: 'patchSomething',
-			responses: {
-				200: {
-					description: '',
-				},
-			},
-		},
-		put: {
-			operationId: 'putSomething',
-			'requestBody': {
-				'description': '',
-				'content': {
-					'application/json': {
-						'schema': {
-							'$ref': '#/components/schemas/Todo',
-						},
+				responses: {
+					200: {
+						description: '',
 					},
 				},
-				'required': true,
 			},
-			responses: {
-				200: {
-					description: '',
+		},
+		'/my-endpoint/somethingagain': {
+			patch: {
+				operationId: 'patchSomething',
+				responses: {
+					200: {
+						description: '',
+					},
+				},
+			},
+			put: {
+				operationId: 'putSomething',
+				'requestBody': {
+					'description': '',
+					'content': {
+						'application/json': {
+							'schema': {
+								'$ref': '#/components/schemas/Todo',
+							},
+						},
+					},
+					'required': true,
+				},
+				responses: {
+					200: {
+						description: '',
+					},
 				},
 			},
 		},
-	},
-	'/second-endpoint': {
-		get: {
-			"tags": [
-				"second"
-			],
-			operationId: 'getSecond',
-			responses: {
-				200: {
-					description: '',
+		'/second-endpoint': {
+			get: {
+				"tags": [
+					"second"
+				],
+				operationId: 'getSecond',
+				responses: {
+					200: {
+						description: '',
+					},
 				},
 			},
 		},
-	},
-	'/second-endpoint/{id}/{name}': {
-		get: {
-			"tags": [
-				"second",
-				"third"
-			],
-			operationId: 'getSomethingByIdAndName',
-			responses: {
-				200: {
-					description: '',
+		'/second-endpoint/{id}/{name}': {
+			get: {
+				"tags": [
+					"second",
+					"third"
+				],
+				operationId: 'getSomethingByIdAndName',
+				responses: {
+					200: {
+						description: '',
+					},
 				},
+				parameters: [{
+					'name': 'id',
+					'in': 'path',
+					'description': '',
+					'required': true,
+					'schema': {
+						'type': 'string',
+					},
+				}, {
+					'name': 'name',
+					'in': 'path',
+					'description': '',
+					'required': true,
+					'schema': {
+						'type': 'string',
+					},
+				}],
 			},
-			parameters: [{
-				'name': 'id',
-				'in': 'path',
-				'description': '',
-				'required': true,
-				'schema': {
-					'type': 'string',
-				},
-			}, {
-				'name': 'name',
-				'in': 'path',
-				'description': '',
-				'required': true,
-				'schema': {
-					'type': 'string',
-				},
-			}],
 		},
-	},
-};
+	};
 
-const expectedSchemas: { [key: string]: Schema } = {
-	Todo: {
-		properties: {
-			title: {
-				type: 'string',
-			},
-			description: {
-				type: 'string',
-			},
-			version: {
-				type: 'number',
-			},
-			cat: {
-				'$ref': '#/components/schemas/Cat',
-			},
-		},
-	},
-	Cat: {
-		properties: {
-			name: {
-				type: 'string',
-			},
-			breed: {
-				type: 'string',
+	const expectedSchemas: { [key: string]: Schema } = {
+		Todo: {
+			properties: {
+				title: {
+					type: 'string',
+				},
+				description: {
+					type: 'string',
+				},
+				version: {
+					type: 'number',
+				},
+				cat: {
+					'$ref': '#/components/schemas/Cat',
+				},
 			},
 		},
-	},
-	CatSearch: {
-		properties: {
-			name: {
-				type: 'string',
-			},
-			breed: {
-				type: 'string',
-			},
-			age: {
-				type: 'number',
+		Cat: {
+			properties: {
+				name: {
+					type: 'string',
+				},
+				breed: {
+					type: 'string',
+				},
 			},
 		},
-	},
-};
-
-Deno.test('Generate app definition', async () => {
-	const app = new DanetApplication();
-	await app.init(MyModule);
+		CatSearch: {
+			properties: {
+				name: {
+					type: 'string',
+				},
+				breed: {
+					type: 'string',
+				},
+				age: {
+					type: 'number',
+				},
+			},
+		},
+	};
+	// const app = new DanetApplication();
+	// await app.init(MyModule);
 	const title = 'Cats example';
 	const description = 'The cats API description';
 	const version = '1.0';
@@ -315,7 +315,7 @@ Deno.test('Generate app definition', async () => {
 		.setVersion(version)
 		.addTag(tagName)
 		.build();
-	const document = await SwaggerModule.createDocument(app, spec) as any;
+	const document = await SwaggerModule.createDocument({ entryModule: MyModule} as any, spec) as any;
 	assertEquals(document, {
 		info: {
 			title: title,
@@ -333,4 +333,22 @@ Deno.test('Generate app definition', async () => {
 		},
 		paths: controllerExpectedPaths,
 	})
+	console.log(Deno.memoryUsage())
+
+	return;
+	// await app.close();
 });
+//
+// Deno.test('host swagger', async () => {
+// 	const swaggerPath = '/api'
+// 	await SwaggerModule.setup(swaggerPath, app, document);
+// 	const listenEvent = await app.listen(0);
+// 	const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
+// 	const filePath = `${__dirname}/../swagger.html`;
+// 	const swaggerHtml = await Deno.readTextFile(filePath);
+// 	const response = await fetch(`http://localhost:${listenEvent.port}${swaggerPath}`);
+// 	assertEquals(response.status, 200);
+// 	const text = await response.text();
+// 	assertEquals(text, swaggerHtml);
+// 	await app.close();
+// });
