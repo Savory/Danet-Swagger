@@ -33,14 +33,14 @@ export class SwaggerModule {
 			schemas: { [key: string]: Schema };
 		} = { paths: {}, schemas: {} };
 		if (imports) {
-			for (let childModule of imports) {
+			for (const childModule of imports) {
 				const childDef = await this.generateModuleDefinition(childModule)
 				definition.paths = { ...definition.paths, ...childDef.paths };
 				definition.schemas = { ...definition.schemas, ...childDef.schemas };
 			}
 		}
 		for (const controller of controllers) {
-			const { paths, schemas } = await this.generateControllerDefinition(
+			const { paths, schemas } = this.generateControllerDefinition(
 				controller,
 			);
 			definition.paths = {
@@ -55,7 +55,7 @@ export class SwaggerModule {
 		return definition;
 	}
 
-	private static async generateControllerDefinition(Controller: Constructor) {
+	private static generateControllerDefinition(Controller: Constructor) {
 		let paths: { [key: string]: Swagger.Path } = {};
 		let schemas: { [key: string]: Schema } = {};
 		const propertyNames = Object.getOwnPropertyNames(Controller.prototype);
