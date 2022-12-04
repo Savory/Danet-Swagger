@@ -23,7 +23,7 @@
 		"emitDecoratorMetadata": true
 	},
 	"tasks": {
-		"test": "deno test --unstable spec",
+		"test": "deno test --unstable spec --allow-env --allow-read --allow-net",
 		"test:watch": "NO_LOG=true deno test --watch --allow-env --allow-net --unstable -A spec"
 	}
 }
