@@ -33,7 +33,7 @@ export namespace Swagger {
 		servers: Server[];
 		components: Components;
 		paths: { [name: string]: Path };
-		security?: SecurityRequirementObject
+		security?: SecurityRequirementObject;
 	}
 
 	export type SecurityRequirementObject = Record<string, string[]>;
@@ -258,7 +258,11 @@ export namespace Swagger {
 		wrapped?: boolean;
 	}
 
-	export type SecuritySchemeType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
+	export type SecuritySchemeType =
+		| 'apiKey'
+		| 'http'
+		| 'oauth2'
+		| 'openIdConnect';
 
 	export interface SecurityScheme {
 		type: SecuritySchemeType;

@@ -2,7 +2,9 @@ import {
 	DanetApplication,
 	MetadataHelper,
 	ModuleConstructor,
-	moduleMetadataKey, path, trimSlash,
+	moduleMetadataKey,
+	path,
+	trimSlash,
 } from './deps.ts';
 import { Swagger } from './swagger.ts';
 import Schema = Swagger.Schema;
@@ -12,15 +14,14 @@ import { MethodDefiner } from './method-definer.ts';
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
 export class SwaggerModule {
-
 	static async createDocument(app: DanetApplication, spec: Swagger.Spec) {
-			const definition = await this.generateModuleDefinition(app.entryModule);
-			spec.paths = definition.paths;
-			spec.components = {
-				...spec.components,
-				schemas: definition.schemas,
-			}
-			return spec;
+		const definition = await this.generateModuleDefinition(app.entryModule);
+		spec.paths = definition.paths;
+		spec.components = {
+			...spec.components,
+			schemas: definition.schemas,
+		};
+		return spec;
 	}
 
 	private static async generateModuleDefinition(Module: ModuleConstructor) {
@@ -34,7 +35,7 @@ export class SwaggerModule {
 		} = { paths: {}, schemas: {} };
 		if (imports) {
 			for (const childModule of imports) {
-				const childDef = await this.generateModuleDefinition(childModule)
+				const childDef = await this.generateModuleDefinition(childModule);
 				definition.paths = { ...definition.paths, ...childDef.paths };
 				definition.schemas = { ...definition.schemas, ...childDef.schemas };
 			}
@@ -73,7 +74,11 @@ export class SwaggerModule {
 		return { paths, schemas };
 	}
 
-	static async setup(apiPath: string, app: DanetApplication, document: Swagger.Spec) {
+	static async setup(
+		apiPath: string,
+		app: DanetApplication,
+		document: Swagger.Spec,
+	) {
 		const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
 		const filePath = `${__dirname}/swagger.html`;
 		const swaggerHtml = await Deno.readTextFile(filePath);

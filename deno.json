@@ -1,13 +1,17 @@
 {
 	"lint": {
 		"files": {
-			"include": ["src/"],
-			"exclude": ["node_modules/"]
+			"exclude": ["spec"]
 		},
 		"rules": {
 			"tags": ["recommended"],
 			"include": ["ban-untagged-todo"],
-			"exclude": ["no-unused-vars"]
+			"exclude": [
+				"no-unused-vars",
+				"no-explicit-any",
+				"no-namespace",
+				"ban-types"
+			]
 		}
 	},
 	"fmt": {
@@ -16,7 +20,7 @@
 			"useTabs": true
 		},
 		"files": {
-			"exclude": ["./node_modules/", "./coverage/", "./doc/"]
+			"exclude": ["*.md"]
 		}
 	},
 	"compilerOptions": {
