@@ -303,8 +303,6 @@ Deno.test('Generate app definition', async () => {
 			},
 		},
 	};
-	// const app = new DanetApplication();
-	// await app.init(MyModule);
 	const title = 'Cats example';
 	const description = 'The cats API description';
 	const version = '1.0';
@@ -336,19 +334,4 @@ Deno.test('Generate app definition', async () => {
 	console.log(Deno.memoryUsage())
 
 	return;
-	// await app.close();
 });
-//
-// Deno.test('host swagger', async () => {
-// 	const swaggerPath = '/api'
-// 	await SwaggerModule.setup(swaggerPath, app, document);
-// 	const listenEvent = await app.listen(0);
-// 	const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
-// 	const filePath = `${__dirname}/../swagger.html`;
-// 	const swaggerHtml = await Deno.readTextFile(filePath);
-// 	const response = await fetch(`http://localhost:${listenEvent.port}${swaggerPath}`);
-// 	assertEquals(response.status, 200);
-// 	const text = await response.text();
-// 	assertEquals(text, swaggerHtml);
-// 	await app.close();
-// });
