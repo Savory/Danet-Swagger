@@ -55,13 +55,14 @@ export const QueryType = (type: Constructor) =>
 export const TAGS_KEY = 'tags';
 
 export const Tag = (tagName: string) =>
-	(
-		target: Object,
-		propertyKey?: string | symbol,
-		descriptor?: PropertyDescriptor,
-	) => {
-	if (propertyKey)
+(
+	target: Object,
+	propertyKey?: string | symbol,
+	descriptor?: PropertyDescriptor,
+) => {
+	if (propertyKey) {
 		MetadataHelper.setMetadata(TAGS_KEY, tagName, target, propertyKey);
-	else
+	} else {
 		MetadataHelper.setMetadata(TAGS_KEY, tagName, target);
-	};
+	}
+};
