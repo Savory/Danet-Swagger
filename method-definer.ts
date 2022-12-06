@@ -63,10 +63,17 @@ export class MethodDefiner {
 	}
 
 	private addTags(actuaPath: Operation) {
-		const controllerTag = MetadataHelper.getMetadata<string>(TAGS_KEY, this.Controller);
-		const methodTag = MetadataHelper.getMetadata<string>(TAGS_KEY, this.Controller.prototype, this.methodName);
+		const controllerTag = MetadataHelper.getMetadata<string>(
+			TAGS_KEY,
+			this.Controller,
+		);
+		const methodTag = MetadataHelper.getMetadata<string>(
+			TAGS_KEY,
+			this.Controller.prototype,
+			this.methodName,
+		);
 		if (controllerTag || methodTag) {
-			actuaPath.tags = [ controllerTag, methodTag ].filter(t => !!t);
+			actuaPath.tags = [controllerTag, methodTag].filter((t) => !!t);
 		}
 	}
 
@@ -207,7 +214,7 @@ export class MethodDefiner {
 		};
 		Object.getOwnPropertyNames(emptyInstance).forEach((propertyName) => {
 			if (schema && schema[name] && schema[name].properties) {
-				let typeFunction = MetadataHelper.getMetadata(
+				const typeFunction = MetadataHelper.getMetadata(
 					'design:type',
 					Type.prototype,
 					propertyName,

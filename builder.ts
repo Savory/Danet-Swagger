@@ -4,7 +4,6 @@ import Schema = Swagger.Schema;
 import Response = Swagger.Response;
 import Header = Swagger.Header;
 
-
 import ServerVariable = Swagger.ServerVariable;
 import SecurityRequirementObject = Swagger.SecurityRequirementObject;
 
@@ -106,7 +105,7 @@ export class SpecBuilder {
 	public addServer(
 		url: string,
 		description?: string,
-		variables?: Record<string, ServerVariable>
+		variables?: Record<string, ServerVariable>,
 	): this {
 		this.spec.servers.push({ url, description, variables });
 		return this;
@@ -120,11 +119,11 @@ export class SpecBuilder {
 	public addTag(
 		name: string,
 		description = '',
-		externalDocs?: Swagger.ExternalDocs
+		externalDocs?: Swagger.ExternalDocs,
 	): this {
 		const tag: Swagger.Tag = {
 			name,
-			description
+			description,
 		};
 		if (externalDocs) {
 			tag.externalDocs = externalDocs;
@@ -136,14 +135,14 @@ export class SpecBuilder {
 	public addSecurity(name: string, options: Swagger.SecurityScheme): this {
 		this.spec.components.securitySchemes = {
 			...this.spec.components.securitySchemes,
-			[name]: options
-		}
+			[name]: options,
+		};
 		return this;
 	}
 
 	public addSecurityRequirements(
 		name: string | SecurityRequirementObject,
-		requirements: string[] = []
+		requirements: string[] = [],
 	): this {
 		let securityRequirement: SecurityRequirementObject;
 
@@ -153,19 +152,18 @@ export class SpecBuilder {
 			securityRequirement = name;
 		}
 
-		this.spec.security =
-			{
-				...this.spec.security,
-				...securityRequirement
-			};
+		this.spec.security = {
+			...this.spec.security,
+			...securityRequirement,
+		};
 		return this;
 	}
 
 	public addBearerAuth(
 		options: Partial<Swagger.SecurityScheme> = {
-			type: 'http'
+			type: 'http',
 		},
-		name = 'bearer'
+		name = 'bearer',
 	): this {
 		this.addSecurity(name, {
 			...options,
@@ -177,19 +175,17 @@ export class SpecBuilder {
 
 	public addOAuth2(
 		options: Partial<Swagger.SecurityScheme> = {
-			type: 'oauth2'
+			type: 'oauth2',
 		},
-		name = 'oauth2'
+		name = 'oauth2',
 	): this {
 		this.addSecurity(name, {
 			...options,
 			type: 'oauth2',
 			flows: {
 				implicit: {
-					scopes: {
-
-					}
-				}
+					scopes: {},
+				},
 			},
 		});
 		return this;
@@ -197,9 +193,9 @@ export class SpecBuilder {
 
 	public addApiKey(
 		options: Partial<Swagger.SecurityScheme> = {
-			type: 'apiKey'
+			type: 'apiKey',
 		},
-		name = 'api_key'
+		name = 'api_key',
 	): this {
 		this.addSecurity(name, {
 			...options,
@@ -212,14 +208,14 @@ export class SpecBuilder {
 
 	public addBasicAuth(
 		options: Partial<Swagger.SecurityScheme> = {
-			type: 'http'
+			type: 'http',
 		},
-		name = 'basic'
+		name = 'basic',
 	): this {
 		this.addSecurity(name, {
 			...options,
 			type: 'http',
-			scheme: 'basic'
+			scheme: 'basic',
 		});
 		return this;
 	}
@@ -227,9 +223,9 @@ export class SpecBuilder {
 	public addCookieAuth(
 		cookieName = 'connect.sid',
 		options: Partial<Swagger.SecurityScheme> = {
-			type: 'apiKey'
+			type: 'apiKey',
 		},
-		securityName = 'cookie'
+		securityName = 'cookie',
 	): this {
 		this.addSecurity(securityName, {
 			...options,
@@ -241,8 +237,6 @@ export class SpecBuilder {
 	}
 
 	public build() {
-		return {
-			...this.spec,
-		}
+		return this.spec;
 	}
 }

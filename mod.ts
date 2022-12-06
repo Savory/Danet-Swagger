@@ -3,6 +3,8 @@ import {
 	MetadataHelper,
 	ModuleConstructor,
 	moduleMetadataKey,
+	path,
+	trimSlash,
 } from './deps.ts';
 import { Swagger } from './swagger.ts';
 import Schema = Swagger.Schema;
@@ -12,15 +14,14 @@ import { MethodDefiner } from './method-definer.ts';
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
 export class SwaggerModule {
-
 	static async createDocument(app: DanetApplication, spec: Swagger.Spec) {
-			const definition = await this.generateModuleDefinition(app.entryModule);
-			spec.paths = definition.paths;
-			spec.components = {
-				...spec.components,
-				schemas: definition.schemas,
-			}
-			return spec;
+		const definition = await this.generateModuleDefinition(app.entryModule);
+		spec.paths = definition.paths;
+		spec.components = {
+			...spec.components,
+			schemas: definition.schemas,
+		};
+		return spec;
 	}
 
 	private static async generateModuleDefinition(Module: ModuleConstructor) {
@@ -33,14 +34,14 @@ export class SwaggerModule {
 			schemas: { [key: string]: Schema };
 		} = { paths: {}, schemas: {} };
 		if (imports) {
-			for (let childModule of imports) {
-				const childDef = await this.generateModuleDefinition(childModule)
+			for (const childModule of imports) {
+				const childDef = await this.generateModuleDefinition(childModule);
 				definition.paths = { ...definition.paths, ...childDef.paths };
 				definition.schemas = { ...definition.schemas, ...childDef.schemas };
 			}
 		}
 		for (const controller of controllers) {
-			const { paths, schemas } = await this.generateControllerDefinition(
+			const { paths, schemas } = this.generateControllerDefinition(
 				controller,
 			);
 			definition.paths = {
@@ -55,7 +56,7 @@ export class SwaggerModule {
 		return definition;
 	}
 
-	private static async generateControllerDefinition(Controller: Constructor) {
+	private static generateControllerDefinition(Controller: Constructor) {
 		let paths: { [key: string]: Swagger.Path } = {};
 		let schemas: { [key: string]: Schema } = {};
 		const propertyNames = Object.getOwnPropertyNames(Controller.prototype);
@@ -73,5 +74,24 @@ export class SwaggerModule {
 		return { paths, schemas };
 	}
 
+	static async setup(
+		apiPath: string,
+		app: DanetApplication,
+		document: Swagger.Spec,
+	) {
+		const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
+		const filePath = `${__dirname}/swagger.html`;
+		const swaggerHtml = await Deno.readTextFile(filePath);
+		apiPath = trimSlash(apiPath);
+		app.danetRouter.router.get(`/${apiPath}`, async (context, next) => {
+			context.response.body = swaggerHtml;
+			await next();
+		});
+		app.danetRouter.router.get(`/${apiPath}/json`, async (context, next) => {
+			context.response.body = document;
+			await next();
+		});
+	}
 }
+
 export { SpecBuilder } from './builder.ts';
