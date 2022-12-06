@@ -22,7 +22,7 @@ export const Optional = () =>
 
 export const RETURNED_TYPE_KEY = 'returntype';
 
-export const ReturnedType = (returnedType: unknown) =>
+export const ReturnedType = (returnedType: unknown, isArray?: boolean) =>
 (
 	target: Object,
 	propertyKey: string | symbol,
@@ -30,7 +30,10 @@ export const ReturnedType = (returnedType: unknown) =>
 ) => {
 	MetadataHelper.setMetadata(
 		RETURNED_TYPE_KEY,
-		returnedType,
+		{
+			returnedType,
+			isArray
+		},
 		target,
 		propertyKey,
 	);

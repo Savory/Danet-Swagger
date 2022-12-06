@@ -177,12 +177,24 @@ export class MethodDefiner {
 			RETURNED_TYPE_KEY,
 			this.Controller.prototype,
 			this.methodName,
-		) as Constructor;
+		) as {
+			returnedType: Constructor,
+			isArray: boolean | undefined
+		};
 		if (returnedValue) {
-			this.generateTypeSchema(returnedValue);
-			actualPath.responses[200] = new ResponseBuilder().jsonContent({
-				'$ref': `#/components/schemas/${returnedValue.name}`,
-			}).setDescription('').get();
+			this.generateTypeSchema(returnedValue.returnedType);
+			if (returnedValue.isArray) {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					type: 'array',
+					items : {
+						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`
+					},
+				}).setDescription('').get();
+			} else {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
+				}).setDescription('').get();
+			}
 		}
 		return null;
 	}

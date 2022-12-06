@@ -82,13 +82,14 @@ class HelloController {
 
 @Controller('my-endpoint')
 class MyController {
-	@ReturnedType(Cat)
+	@ReturnedType(Cat, true)
 	@QueryType(CatSearch)
 	@Get()
-	getSomething(): Cat {
-		return new Cat();
+	getSomething(): Cat[] {
+		return [new Cat()];
 	}
 
+	@ReturnedType(Todo)
 	@Post()
 	postSomething(@Body() todo: Todo): number {
 		return 1;
