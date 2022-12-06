@@ -89,7 +89,12 @@ const expectedSpec = {
 						'description': '',
 						'content': {
 							'application/json': {
-								'schema': { '$ref': '#/components/schemas/Cat' },
+								'schema' : {
+									'type': 'array',
+									'items': {
+										'$ref': '#/components/schemas/Cat'
+									},
+								},
 							},
 						},
 					},
@@ -116,7 +121,18 @@ const expectedSpec = {
 			},
 			'post': {
 				'operationId': 'postSomething',
-				'responses': { '200': { 'description': '' } },
+				'responses': {
+					'200': {
+						'description': '',
+						'content': {
+							'application/json': {
+								'schema' : {
+										'$ref': '#/components/schemas/Todo'
+								},
+							},
+						},
+					},
+				},
 				'requestBody': {
 					'content': {
 						'application/json': {
