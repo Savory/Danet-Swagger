@@ -79,9 +79,8 @@ export class SwaggerModule {
 		app: DanetApplication,
 		document: Swagger.Spec,
 	) {
-		// const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
-		// const filePath = `${__dirname}/swagger.html`;
-		const swaggerHtml = await Deno.readTextFile('./swagger.html');
+		const url = new URL("./swagger.html", import.meta.url).href
+		const swaggerHtml = await (await fetch(url)).text();
 		apiPath = trimSlash(apiPath);
 		app.danetRouter.router.get(`/${apiPath}`, async (context, next) => {
 			context.response.body = swaggerHtml;
