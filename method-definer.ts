@@ -1,18 +1,12 @@
 import { Swagger } from './swagger.ts';
 import { Constructor } from './mod.ts';
-import { trimSlash } from '../Danet/src/router/utils.ts';
-import { MetadataHelper } from '../Danet/src/metadata/helper.ts';
 import { OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
-import {
-	BODY_TYPE_KEY,
-	QUERY_TYPE_KEY,
-} from '../Danet/src/router/controller/params/decorators.ts';
 import DataType = Swagger.DataType;
 import Path = Swagger.Path;
 import Operation = Swagger.Operation;
 import Schema = Swagger.Schema;
-import { pathToRegexp } from './deps.ts';
+import { BODY_TYPE_KEY, MetadataHelper, pathToRegexp, QUERY_TYPE_KEY, trimSlash } from './deps.ts';
 import Parameter = Swagger.Parameter;
 
 export class MethodDefiner {
