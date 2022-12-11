@@ -44,6 +44,8 @@ class CatSearch {
 	@ApiProperty()
 	age?: number;
 
+	nonDecoratedProperty!: string;
+
 	constructor(name: string) {
 		this.name = name;
 	}

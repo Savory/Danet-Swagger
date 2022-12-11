@@ -112,25 +112,27 @@ export class MethodDefiner {
 					queryType.prototype,
 					propertyName,
 				) as boolean;
-				const propertyType = typeFunction;
-				const propertyTypeName = propertyType.name;
-				const paramToAdd: Partial<Parameter> = {
-					name: `${propertyName}`,
-					in: 'query',
-					description: '',
-					required: isOptional,
-				};
-				if (['string', 'number'].includes(propertyTypeName.toLowerCase())) {
-					paramToAdd.schema = {
-						type: propertyTypeName.toLowerCase() as DataType,
+				if (typeFunction) {
+					const propertyType = typeFunction;
+					const propertyTypeName = propertyType.name;
+					const paramToAdd: Partial<Parameter> = {
+						name: `${propertyName}`,
+						in: 'query',
+						description: '',
+						required: isOptional,
 					};
-				} else {
-					this.generateTypeSchema(propertyType);
-					paramToAdd.schema = {
-						$ref: `#/components/schemas/${propertyTypeName}`,
-					};
+					if ([ 'string', 'number' ].includes(propertyTypeName.toLowerCase())) {
+						paramToAdd.schema = {
+							type: propertyTypeName.toLowerCase() as DataType,
+						};
+					} else {
+						this.generateTypeSchema(propertyType);
+						paramToAdd.schema = {
+							$ref: `#/components/schemas/${propertyTypeName}`,
+						};
+					}
+					actualPath.parameters!.push(paramToAdd as Parameter);
 				}
-				actualPath.parameters!.push(paramToAdd as Parameter);
 			});
 		}
 	}
@@ -225,15 +227,17 @@ export class MethodDefiner {
 					Type.prototype,
 					propertyName,
 				) as Function;
-				const propertyType = typeFunction.name;
-				if (['string', 'number'].includes(propertyType.toLowerCase())) {
-					schema![name]!.properties![propertyName] = {
-						type: propertyType.toLowerCase() as DataType,
-					};
-				} else {
-					schema![name]!.properties![propertyName] = {
-						$ref: `#/components/schemas/${propertyType}`,
-					};
+				if (typeFunction) {
+					const propertyType = typeFunction.name;
+					if ([ 'string', 'number' ].includes(propertyType.toLowerCase())) {
+						schema![name]!.properties![propertyName] = {
+							type: propertyType.toLowerCase() as DataType,
+						};
+					} else {
+						schema![name]!.properties![propertyName] = {
+							$ref: `#/components/schemas/${propertyType}`,
+						};
+					}
 				}
 			}
 		});
