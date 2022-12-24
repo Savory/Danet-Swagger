@@ -40,18 +40,20 @@ export class SwaggerModule {
 				definition.schemas = { ...definition.schemas, ...childDef.schemas };
 			}
 		}
-		for (const controller of controllers) {
-			const { paths, schemas } = this.generateControllerDefinition(
-				controller,
-			);
-			definition.paths = {
-				...definition.paths,
-				...paths,
-			};
-			definition.schemas = {
-				...definition.schemas,
-				...schemas,
-			};
+		if (controllers) {
+			for (const controller of controllers) {
+				const { paths, schemas } = this.generateControllerDefinition(
+					controller,
+				);
+				definition.paths = {
+					...definition.paths,
+					...paths,
+				};
+				definition.schemas = {
+					...definition.schemas,
+					...schemas,
+				};
+			}
 		}
 		return definition;
 	}
