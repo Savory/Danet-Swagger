@@ -28,6 +28,19 @@ class Cat {
 	@ApiProperty()
 	breed!: string;
 
+	@ApiProperty()
+	dob!: Date;
+
+	@Optional()
+	@ApiProperty()
+	isHungry?: boolean;
+
+	@ApiProperty()
+	color?: any;
+
+	@ApiProperty()
+	hobbies?: any[];
+
 	constructor() {
 	}
 }
