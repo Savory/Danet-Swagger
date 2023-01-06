@@ -10,6 +10,8 @@ import Schema = Swagger.Schema;
 import { BODY_TYPE_KEY, MetadataHelper, pathToRegexp, QUERY_TYPE_KEY, trimSlash } from './deps.ts';
 import Parameter = Swagger.Parameter;
 
+const primiviteTypes = [ 'string', 'number', 'boolean', 'date', 'object', 'array' ];
+
 export class MethodDefiner {
 	private pathKey: string;
 	private readonly httpMethod: keyof Path;
@@ -122,7 +124,7 @@ export class MethodDefiner {
 						description: '',
 						required: isRequired,
 					};
-					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyTypeName.toLowerCase())) {
+					if (primiviteTypes.includes(propertyTypeName.toLowerCase())) {
 						paramToAdd.schema = this.getPropertyType(propertyTypeName.toLowerCase())
 					} else {
 						this.generateTypeSchema(propertyType);
@@ -190,7 +192,10 @@ export class MethodDefiner {
 			isArray: boolean | undefined
 		};
 		if (returnedValue) {
-			this.generateTypeSchema(returnedValue.returnedType);
+			if (!(primiviteTypes.includes(returnedValue.returnedType.name.toLowerCase()))) {
+				this.generateTypeSchema(returnedValue.returnedType);
+			}
+
 			if (returnedValue.isArray) {
 				actualPath.responses[200] = new ResponseBuilder().jsonContent({
 					type: 'array',
@@ -199,9 +204,17 @@ export class MethodDefiner {
 					},
 				}).setDescription('').get();
 			} else {
-				actualPath.responses[200] = new ResponseBuilder().jsonContent({
-					'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-				}).setDescription('').get();
+				console.log(returnedValue.returnedType);
+				if (primiviteTypes.includes(returnedValue.returnedType.name.toLowerCase())) {
+					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+						type: returnedValue.returnedType.name.toLowerCase() as DataType,
+					}).setDescription('').get();
+				} else {
+					this.generateTypeSchema(returnedValue.returnedType);
+					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
+					}).setDescription('').get();
+				}
 			}
 		}
 		return null;
@@ -246,7 +259,7 @@ export class MethodDefiner {
 				) as boolean);
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
-					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyType.toLowerCase())) {
+					if (primiviteTypes.includes(propertyType.toLowerCase())) {
 						schema![name]!.properties![propertyName] = this.getPropertyType(propertyType.toLowerCase())
 					} else {
 						schema![name]!.properties![propertyName] = {

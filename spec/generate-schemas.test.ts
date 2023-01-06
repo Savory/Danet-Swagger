@@ -157,11 +157,26 @@ const expectedSpec = {
 		'/my-endpoint/somethingagain': {
 			'patch': {
 				'operationId': 'patchSomething',
-				'responses': { '200': { 'description': '' } },
+				'responses': {
+					'200': {
+							'description': '',
+							'content': {
+							'application/json': {
+								'schema' : {
+									'type': 'boolean'
+									},
+								},
+							},
+					},
+				},
 			},
 			'put': {
 				'operationId': 'putSomething',
-				'responses': { '200': { 'description': '' } },
+				'responses': {
+					'200': {
+						'description': '',
+					},
+				},
 				'requestBody': {
 					'content': {
 						'application/json': {

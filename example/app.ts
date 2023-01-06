@@ -110,6 +110,7 @@ class MyController {
 		return 1;
 	}
 
+	@ReturnedType(Boolean)
 	@Patch('somethingagain')
 	patchSomething(): boolean {
 		return true;
