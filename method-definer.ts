@@ -211,35 +211,33 @@ export class MethodDefiner {
 			isArray: boolean | undefined;
 		};
 		if (returnedValue) {
-			if (
-				!(isPrimitive(
-					returnedValue.returnedType.name.toLowerCase(),
-				))
-			) {
-				this.generateTypeSchema(returnedValue.returnedType);
-			}
-
-			if (returnedValue.isArray) {
-				actualPath.responses[200] = new ResponseBuilder().jsonContent({
-					type: 'array',
-					items: {
-						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-					},
-				}).setDescription('').get();
-			} else {
-				console.log(returnedValue.returnedType);
-				if (
-					isPrimitive(returnedValue.returnedType.name.toLowerCase())
-				) {
+			if (isPrimitive(returnedValue.returnedType.name.toLowerCase())) {
+				if (returnedValue.isArray) {
+					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+						type: 'array',
+						items: {
+							type: returnedValue.returnedType.name.toLowerCase() as DataType,
+						},
+					}).setDescription('').get();
+				} else {
 					actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						type: returnedValue.returnedType.name.toLowerCase() as DataType,
 					}).setDescription('').get();
+				}
+			} else {
+				if (returnedValue.isArray) {
+					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+						type: 'array',
+						items: {
+							'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
+						},
+					}).setDescription('').get();
 				} else {
-					this.generateTypeSchema(returnedValue.returnedType);
 					actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
 					}).setDescription('').get();
 				}
+				this.generateTypeSchema(returnedValue.returnedType);
 			}
 		}
 		return null;
