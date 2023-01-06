@@ -25,6 +25,10 @@ const primitiveTypes = [
 	'array',
 ];
 
+function isPrimitive(type: string) {
+	return primitiveTypes.includes(type);
+}
+
 export class MethodDefiner {
 	private pathKey: string;
 	private readonly httpMethod: keyof Path;
@@ -137,7 +141,7 @@ export class MethodDefiner {
 						description: '',
 						required: isRequired,
 					};
-					if (primitiveTypes.includes(propertyTypeName.toLowerCase())) {
+					if (isPrimitive(propertyTypeName.toLowerCase())) {
 						paramToAdd.schema = this.getPropertyType(
 							propertyTypeName.toLowerCase(),
 						);
@@ -208,7 +212,7 @@ export class MethodDefiner {
 		};
 		if (returnedValue) {
 			if (
-				!(primitiveTypes.includes(
+				!(isPrimitive(
 					returnedValue.returnedType.name.toLowerCase(),
 				))
 			) {
@@ -225,7 +229,7 @@ export class MethodDefiner {
 			} else {
 				console.log(returnedValue.returnedType);
 				if (
-					primitiveTypes.includes(returnedValue.returnedType.name.toLowerCase())
+					isPrimitive(returnedValue.returnedType.name.toLowerCase())
 				) {
 					actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						type: returnedValue.returnedType.name.toLowerCase() as DataType,
@@ -280,7 +284,7 @@ export class MethodDefiner {
 				) as boolean);
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
-					if (primitiveTypes.includes(propertyType.toLowerCase())) {
+					if (isPrimitive(propertyType.toLowerCase())) {
 						schema![name]!.properties![propertyName] = this.getPropertyType(
 							propertyType.toLowerCase(),
 						);
