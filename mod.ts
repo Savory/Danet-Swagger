@@ -81,7 +81,7 @@ export class SwaggerModule {
 		app: DanetApplication,
 		document: Swagger.Spec,
 	) {
-		const url = new URL("./swagger.html", import.meta.url).href
+		const url = new URL('./swagger.html', import.meta.url).href;
 		const swaggerHtml = await (await fetch(url)).text();
 		apiPath = trimSlash(apiPath);
 		app.danetRouter.router.get(`/${apiPath}`, async (context, next) => {

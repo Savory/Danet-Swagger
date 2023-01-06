@@ -7,10 +7,23 @@ import DataFormat = Swagger.DataFormat;
 import Path = Swagger.Path;
 import Operation = Swagger.Operation;
 import Schema = Swagger.Schema;
-import { BODY_TYPE_KEY, MetadataHelper, pathToRegexp, QUERY_TYPE_KEY, trimSlash } from './deps.ts';
+import {
+	BODY_TYPE_KEY,
+	MetadataHelper,
+	pathToRegexp,
+	QUERY_TYPE_KEY,
+	trimSlash,
+} from './deps.ts';
 import Parameter = Swagger.Parameter;
 
-const primiviteTypes = [ 'string', 'number', 'boolean', 'date', 'object', 'array' ];
+const primitiveTypes = [
+	'string',
+	'number',
+	'boolean',
+	'date',
+	'object',
+	'array',
+];
 
 export class MethodDefiner {
 	private pathKey: string;
@@ -124,8 +137,10 @@ export class MethodDefiner {
 						description: '',
 						required: isRequired,
 					};
-					if (primiviteTypes.includes(propertyTypeName.toLowerCase())) {
-						paramToAdd.schema = this.getPropertyType(propertyTypeName.toLowerCase())
+					if (primitiveTypes.includes(propertyTypeName.toLowerCase())) {
+						paramToAdd.schema = this.getPropertyType(
+							propertyTypeName.toLowerCase(),
+						);
 					} else {
 						this.generateTypeSchema(propertyType);
 						paramToAdd.schema = {
@@ -142,7 +157,7 @@ export class MethodDefiner {
 		if (propertyType === 'date') {
 			return {
 				type: 'string' as DataType,
-				format: 'date-time' as DataFormat
+				format: 'date-time' as DataFormat,
 			};
 		} else {
 			return {
@@ -188,24 +203,30 @@ export class MethodDefiner {
 			this.Controller.prototype,
 			this.methodName,
 		) as {
-			returnedType: Constructor,
-			isArray: boolean | undefined
+			returnedType: Constructor;
+			isArray: boolean | undefined;
 		};
 		if (returnedValue) {
-			if (!(primiviteTypes.includes(returnedValue.returnedType.name.toLowerCase()))) {
+			if (
+				!(primitiveTypes.includes(
+					returnedValue.returnedType.name.toLowerCase(),
+				))
+			) {
 				this.generateTypeSchema(returnedValue.returnedType);
 			}
 
 			if (returnedValue.isArray) {
 				actualPath.responses[200] = new ResponseBuilder().jsonContent({
 					type: 'array',
-					items : {
-						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`
+					items: {
+						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
 					},
 				}).setDescription('').get();
 			} else {
 				console.log(returnedValue.returnedType);
-				if (primiviteTypes.includes(returnedValue.returnedType.name.toLowerCase())) {
+				if (
+					primitiveTypes.includes(returnedValue.returnedType.name.toLowerCase())
+				) {
 					actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						type: returnedValue.returnedType.name.toLowerCase() as DataType,
 					}).setDescription('').get();
@@ -259,16 +280,19 @@ export class MethodDefiner {
 				) as boolean);
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
-					if (primiviteTypes.includes(propertyType.toLowerCase())) {
-						schema![name]!.properties![propertyName] = this.getPropertyType(propertyType.toLowerCase())
+					if (primitiveTypes.includes(propertyType.toLowerCase())) {
+						schema![name]!.properties![propertyName] = this.getPropertyType(
+							propertyType.toLowerCase(),
+						);
 					} else {
 						schema![name]!.properties![propertyName] = {
 							$ref: `#/components/schemas/${propertyType}`,
 						};
 					}
 					if (!isOptional) {
-						if (!(schema![name]!.required))
+						if (!(schema![name]!.required)) {
 							schema![name]!.required = [];
+						}
 						schema![name]!.required!.push(propertyName);
 					}
 				}

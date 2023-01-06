@@ -18,7 +18,7 @@ const expectedSpec = {
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
-				'properties': { 'name': { 'type': 'string', } }
+				'properties': { 'name': { 'type': 'string' } },
 			},
 			'CatSearch': {
 				'required': ['name'],
@@ -31,21 +31,21 @@ const expectedSpec = {
 			'Cat': {
 				'required': ['name', 'breed', 'dob', 'color', 'hobbies'],
 				'properties': {
-					'name': { 'type': 'string', },
-					'breed': { 'type': 'string',  },
-					'dob': { 'type': 'string', 'format': 'date-time', },
+					'name': { 'type': 'string' },
+					'breed': { 'type': 'string' },
+					'dob': { 'type': 'string', 'format': 'date-time' },
 					'isHungry': { 'type': 'boolean' },
-					'color': { 'type': 'object', },
-					'hobbies': { 'type': 'array', },
+					'color': { 'type': 'object' },
+					'hobbies': { 'type': 'array' },
 				},
 			},
 			'Todo': {
 				'required': ['title', 'description', 'version', 'cat'],
 				'properties': {
-					'title': { 'type': 'string', },
-					'description': { 'type': 'string', },
-					'version': { 'type': 'number', },
-					'cat': { '$ref': '#/components/schemas/Cat'},
+					'title': { 'type': 'string' },
+					'description': { 'type': 'string' },
+					'version': { 'type': 'number' },
+					'cat': { '$ref': '#/components/schemas/Cat' },
 				},
 			},
 		},
@@ -68,7 +68,7 @@ const expectedSpec = {
 					'in': 'path',
 					'description': '',
 					'required': true,
-					'schema': { 'type': 'string'},
+					'schema': { 'type': 'string' },
 				}, {
 					'name': 'name',
 					'in': 'path',
@@ -99,10 +99,10 @@ const expectedSpec = {
 						'description': '',
 						'content': {
 							'application/json': {
-								'schema' : {
+								'schema': {
 									'type': 'array',
 									'items': {
-										'$ref': '#/components/schemas/Cat'
+										'$ref': '#/components/schemas/Cat',
 									},
 								},
 							},
@@ -136,8 +136,8 @@ const expectedSpec = {
 						'description': '',
 						'content': {
 							'application/json': {
-								'schema' : {
-										'$ref': '#/components/schemas/Todo'
+								'schema': {
+									'$ref': '#/components/schemas/Todo',
 								},
 							},
 						},
@@ -159,14 +159,14 @@ const expectedSpec = {
 				'operationId': 'patchSomething',
 				'responses': {
 					'200': {
-							'description': '',
-							'content': {
+						'description': '',
+						'content': {
 							'application/json': {
-								'schema' : {
-									'type': 'boolean'
-									},
+								'schema': {
+									'type': 'boolean',
 								},
 							},
+						},
 					},
 				},
 			},

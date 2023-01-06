@@ -8,7 +8,8 @@
 
 ## Description
 
-[OpenAPI (Swagger)](https://www.openapis.org/) module for [Danet](https://github.com/Savory/Danet).
+[OpenAPI (Swagger)](https://www.openapis.org/) module for
+[Danet](https://github.com/Savory/Danet).
 
 ## Quick Start
 

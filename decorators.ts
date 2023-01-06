@@ -32,7 +32,7 @@ export const ReturnedType = (returnedType: unknown, isArray?: boolean) =>
 		RETURNED_TYPE_KEY,
 		{
 			returnedType,
-			isArray
+			isArray,
 		},
 		target,
 		propertyKey,
