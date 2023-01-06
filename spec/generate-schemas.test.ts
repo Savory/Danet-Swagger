@@ -28,6 +28,10 @@ const expectedSpec = {
 				'properties': {
 					'name': { 'type': 'string' },
 					'breed': { 'type': 'string' },
+					'dob': { 'type': 'string', 'format': 'date-time' },
+					'isHungry': { 'type': 'boolean' },
+					'color': { 'type': 'object' },
+					'hobbies': { 'type': 'array' },
 				},
 			},
 			'Todo': {

@@ -3,6 +3,7 @@ import { Constructor } from './mod.ts';
 import { OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
 import DataType = Swagger.DataType;
+import DataFormat = Swagger.DataFormat;
 import Path = Swagger.Path;
 import Operation = Swagger.Operation;
 import Schema = Swagger.Schema;
@@ -121,10 +122,8 @@ export class MethodDefiner {
 						description: '',
 						required: isOptional,
 					};
-					if ([ 'string', 'number' ].includes(propertyTypeName.toLowerCase())) {
-						paramToAdd.schema = {
-							type: propertyTypeName.toLowerCase() as DataType,
-						};
+					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyTypeName.toLowerCase())) {
+						paramToAdd.schema = this.getPropertyType(propertyTypeName.toLowerCase())
 					} else {
 						this.generateTypeSchema(propertyType);
 						paramToAdd.schema = {
@@ -134,6 +133,19 @@ export class MethodDefiner {
 					actualPath.parameters!.push(paramToAdd as Parameter);
 				}
 			});
+		}
+	}
+
+	private getPropertyType(propertyType: string) {
+		if (propertyType === 'date') {
+			return {
+				type: 'string' as DataType,
+				format: 'date-time' as DataFormat
+			};
+		} else {
+			return {
+				type: propertyType as DataType,
+			};
 		}
 	}
 
@@ -229,10 +241,8 @@ export class MethodDefiner {
 				) as Function;
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
-					if ([ 'string', 'number' ].includes(propertyType.toLowerCase())) {
-						schema![name]!.properties![propertyName] = {
-							type: propertyType.toLowerCase() as DataType,
-						};
+					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyType.toLowerCase())) {
+						schema![name]!.properties![propertyName] = this.getPropertyType(propertyType.toLowerCase())
 					} else {
 						schema![name]!.properties![propertyName] = {
 							$ref: `#/components/schemas/${propertyType}`,
