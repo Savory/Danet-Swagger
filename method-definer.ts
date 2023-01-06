@@ -108,7 +108,7 @@ export class MethodDefiner {
 					queryType.prototype,
 					propertyName,
 				) as Constructor<any>;
-				const isOptional = !MetadataHelper.getMetadata(
+				const isRequired = !MetadataHelper.getMetadata(
 					OPTIONAL_KEY,
 					queryType.prototype,
 					propertyName,
@@ -120,7 +120,7 @@ export class MethodDefiner {
 						name: `${propertyName}`,
 						in: 'query',
 						description: '',
-						required: isOptional,
+						required: isRequired,
 					};
 					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyTypeName.toLowerCase())) {
 						paramToAdd.schema = this.getPropertyType(propertyTypeName.toLowerCase())
@@ -239,6 +239,11 @@ export class MethodDefiner {
 					Type.prototype,
 					propertyName,
 				) as Function;
+				const isOptional = !!(MetadataHelper.getMetadata(
+					OPTIONAL_KEY,
+					Type.prototype,
+					propertyName,
+				) as boolean);
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
 					if ([ 'string', 'number', 'boolean', 'date', 'object', 'array' ].includes(propertyType.toLowerCase())) {
@@ -247,6 +252,11 @@ export class MethodDefiner {
 						schema![name]!.properties![propertyName] = {
 							$ref: `#/components/schemas/${propertyType}`,
 						};
+					}
+					if (!isOptional) {
+						if (!(schema![name]!.required))
+							schema![name]!.required = [];
+						schema![name]!.required!.push(propertyName);
 					}
 				}
 			}

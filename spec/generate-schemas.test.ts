@@ -16,8 +16,12 @@ const expectedSpec = {
 	'openapi': '3.0.3',
 	'components': {
 		'schemas': {
-			'NameSearch': { 'properties': { 'name': { 'type': 'string' } } },
+			'NameSearch': {
+				'required': ['name'],
+				'properties': { 'name': { 'type': 'string', } }
+			},
 			'CatSearch': {
+				'required': ['name'],
 				'properties': {
 					'name': { 'type': 'string' },
 					'breed': { 'type': 'string' },
@@ -25,21 +29,23 @@ const expectedSpec = {
 				},
 			},
 			'Cat': {
+				'required': ['name', 'breed', 'dob', 'color', 'hobbies'],
 				'properties': {
-					'name': { 'type': 'string' },
-					'breed': { 'type': 'string' },
-					'dob': { 'type': 'string', 'format': 'date-time' },
+					'name': { 'type': 'string', },
+					'breed': { 'type': 'string',  },
+					'dob': { 'type': 'string', 'format': 'date-time', },
 					'isHungry': { 'type': 'boolean' },
-					'color': { 'type': 'object' },
-					'hobbies': { 'type': 'array' },
+					'color': { 'type': 'object', },
+					'hobbies': { 'type': 'array', },
 				},
 			},
 			'Todo': {
+				'required': ['title', 'description', 'version', 'cat'],
 				'properties': {
-					'title': { 'type': 'string' },
-					'description': { 'type': 'string' },
-					'version': { 'type': 'number' },
-					'cat': { '$ref': '#/components/schemas/Cat' },
+					'title': { 'type': 'string', },
+					'description': { 'type': 'string', },
+					'version': { 'type': 'number', },
+					'cat': { '$ref': '#/components/schemas/Cat'},
 				},
 			},
 		},
@@ -62,7 +68,7 @@ const expectedSpec = {
 					'in': 'path',
 					'description': '',
 					'required': true,
-					'schema': { 'type': 'string' },
+					'schema': { 'type': 'string'},
 				}, {
 					'name': 'name',
 					'in': 'path',
