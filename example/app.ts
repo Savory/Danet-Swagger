@@ -1,4 +1,5 @@
 import {
+	ApiBasicAuth,
 	ApiProperty, ApiSecurity,
 	BodyType,
 	Optional,
@@ -127,7 +128,7 @@ class MyController {
 
 
 
-@ApiSecurity('basic')
+@ApiBasicAuth()
 @Tag('second')
 @Controller('second-endpoint')
 class SecondController {

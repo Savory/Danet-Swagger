@@ -76,6 +76,8 @@ export const Tag = (tagName: string) =>
 
 export const API_SECURITY = 'api-security';
 
+export const ApiBasicAuth = () => ApiSecurity('basic')
+
 export const ApiSecurity = (security: string) =>
 	(
 		// deno-lint-ignore ban-types
