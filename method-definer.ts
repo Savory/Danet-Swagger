@@ -78,15 +78,27 @@ export class MethodDefiner {
 	}
 
 	private addSecurity(actualPath: Operation) {
+		const controllerSecurity = MetadataHelper.getMetadata<string>(
+			API_SECURITY,
+			this.Controller,
+		);
 		const methodSecurity = MetadataHelper.getMetadata<string>(
 			API_SECURITY,
 			this.Controller.prototype,
 			this.methodName,
 		);
-		if (methodSecurity) {
-			actualPath.security = [{
-				[methodSecurity]: []
-			}]
+		if (methodSecurity || controllerSecurity) {
+			actualPath.security = [];
+			if (methodSecurity) {
+				actualPath.security.push({
+					[methodSecurity]: [],
+				})
+			}
+			if (controllerSecurity && methodSecurity !== controllerSecurity) {
+				actualPath.security.push({
+					[controllerSecurity]: []
+				})
+			}
 		}
 	}
 	private addTags(actualPath: Operation) {

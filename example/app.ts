@@ -125,6 +125,9 @@ class MyController {
 	}
 }
 
+
+
+@ApiSecurity('basic')
 @Tag('second')
 @Controller('second-endpoint')
 class SecondController {

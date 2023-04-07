@@ -79,6 +79,9 @@ const expectedSpec = {
 					'required': true,
 					'schema': { 'type': 'string' },
 				}],
+				'security': [{
+					'basic': [],
+				}]
 			},
 		},
 		'/hello': {

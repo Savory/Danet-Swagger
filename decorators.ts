@@ -80,7 +80,11 @@ export const ApiSecurity = (security: string) =>
 	(
 		// deno-lint-ignore ban-types
 		target: Object,
-		propertyKey: string | symbol,
+		propertyKey?: string | symbol,
+		descriptor?: PropertyDescriptor,
 	) => {
+	if (propertyKey)
 		MetadataHelper.setMetadata(API_SECURITY, security, target, propertyKey);
+	else
+		MetadataHelper.setMetadata(API_SECURITY, security, target);
 	};
