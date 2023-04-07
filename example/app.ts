@@ -1,5 +1,5 @@
 import {
-	ApiProperty,
+	ApiProperty, ApiSecurity,
 	BodyType,
 	Optional,
 	QueryType,
@@ -128,6 +128,7 @@ class MyController {
 @Tag('second')
 @Controller('second-endpoint')
 class SecondController {
+	@ApiSecurity('basic')
 	@Get()
 	getSecond() {
 		return 'hello';

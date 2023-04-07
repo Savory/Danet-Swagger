@@ -73,3 +73,14 @@ export const Tag = (tagName: string) =>
 		MetadataHelper.setMetadata(TAGS_KEY, tagName, target);
 	}
 };
+
+export const API_SECURITY = 'api-security';
+
+export const ApiSecurity = (security: string) =>
+	(
+		// deno-lint-ignore ban-types
+		target: Object,
+		propertyKey: string | symbol,
+	) => {
+		MetadataHelper.setMetadata(API_SECURITY, security, target, propertyKey);
+	};

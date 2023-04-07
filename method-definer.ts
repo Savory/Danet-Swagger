@@ -1,6 +1,6 @@
 import { Swagger } from './swagger.ts';
 import { Constructor } from './mod.ts';
-import { API_PROPERTY, OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
+import { API_PROPERTY, API_SECURITY, OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
 import DataType = Swagger.DataType;
 import DataFormat = Swagger.DataFormat;
@@ -65,6 +65,7 @@ export class MethodDefiner {
 		this.addQueryParams(actualPath);
 		this.addResponse(actualPath);
 		this.addRequestBody(actualPath);
+		this.addSecurity(actualPath);
 		schemas = {
 			...schemas,
 			...this.schemas,
@@ -76,7 +77,19 @@ export class MethodDefiner {
 		};
 	}
 
-	private addTags(actuaPath: Operation) {
+	private addSecurity(actualPath: Operation) {
+		const methodSecurity = MetadataHelper.getMetadata<string>(
+			API_SECURITY,
+			this.Controller.prototype,
+			this.methodName,
+		);
+		if (methodSecurity) {
+			actualPath.security = [{
+				[methodSecurity]: []
+			}]
+		}
+	}
+	private addTags(actualPath: Operation) {
 		const controllerTag = MetadataHelper.getMetadata<string>(
 			TAGS_KEY,
 			this.Controller,
@@ -87,7 +100,7 @@ export class MethodDefiner {
 			this.methodName,
 		);
 		if (controllerTag || methodTag) {
-			actuaPath.tags = [controllerTag, methodTag].filter((t) => !!t);
+			actualPath.tags = [controllerTag, methodTag].filter((t) => !!t);
 		}
 	}
 

@@ -11,6 +11,7 @@ const spec = new SpecBuilder()
 	.setDescription(description)
 	.setVersion(version)
 	.addTag(tagName)
+	.addBasicAuth()
 	.build();
 const swaggerPath = '/api';
 const document = await SwaggerModule.createDocument(app, spec) as any;

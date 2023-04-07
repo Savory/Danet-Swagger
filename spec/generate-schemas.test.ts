@@ -14,6 +14,7 @@ const expectedSpec = {
 	'servers': [],
 	'openapi': '3.0.3',
 	'components': {
+		"securitySchemes":{"basic":{"type":"http","scheme":"basic"}},
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
@@ -55,6 +56,9 @@ const expectedSpec = {
 				'operationId': 'getSecond',
 				'responses': { '200': { 'description': '' } },
 				'tags': ['second'],
+				'security': [{
+					'basic': [],
+				}]
 			},
 		},
 		'/second-endpoint/{id}/{name}': {
@@ -198,6 +202,7 @@ const spec = new SpecBuilder()
 	.setTitle(title)
 	.setDescription(description)
 	.setVersion(version)
+	.addBasicAuth()
 	.addTag(tagName)
 	.build();
 const document = await SwaggerModule.createDocument(app, spec) as any;
