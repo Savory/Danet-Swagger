@@ -2,7 +2,6 @@ import { path } from '../deps.ts';
 import { app } from '../example/app.ts';
 import { assertEquals } from './test_deps.ts';
 import { SwaggerModule } from '../mod.ts';
-import { Swagger } from '../swagger.ts';
 import { SpecBuilder } from '../mod.ts';
 
 const expectedSpec = {
@@ -42,7 +41,7 @@ const expectedSpec = {
 			'Todo': {
 				'required': ['title', 'description', 'version', 'cat'],
 				'properties': {
-					'title': { 'type': 'string' },
+					'title': { 'type': 'string', 'description': 'my description' },
 					'description': { 'type': 'string' },
 					'version': { 'type': 'number' },
 					'cat': { '$ref': '#/components/schemas/Cat' },

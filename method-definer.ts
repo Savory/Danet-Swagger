@@ -1,6 +1,6 @@
 import { Swagger } from './swagger.ts';
 import { Constructor } from './mod.ts';
-import { OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
+import { API_PROPERTY, OPTIONAL_KEY, RETURNED_TYPE_KEY, TAGS_KEY } from './decorators.ts';
 import { RequestBodyBuilder, ResponseBuilder } from './builder.ts';
 import DataType = Swagger.DataType;
 import DataFormat = Swagger.DataFormat;
@@ -280,6 +280,11 @@ export class MethodDefiner {
 					Type.prototype,
 					propertyName,
 				) as boolean);
+				const attributesProperties = MetadataHelper.getMetadata(
+					API_PROPERTY,
+					Type.prototype,
+					propertyName,
+				);
 				if (typeFunction) {
 					const propertyType = typeFunction.name;
 					if (isPrimitive(propertyType.toLowerCase())) {
@@ -296,6 +301,12 @@ export class MethodDefiner {
 							schema![name]!.required = [];
 						}
 						schema![name]!.required!.push(propertyName);
+					}
+					if (attributesProperties) {
+						schema![name]!.properties![propertyName] = {
+							...schema![name]!.properties![propertyName],
+							...attributesProperties,
+						}
 					}
 				}
 			}

@@ -1,12 +1,16 @@
 import { BODY_TYPE_KEY, MetadataHelper, QUERY_TYPE_KEY } from './deps.ts';
 import { Constructor } from './mod.ts';
+import { Swagger } from "./swagger.ts";
 
-export const ApiProperty = () =>
+export const API_PROPERTY = 'api-property';
+
+export const ApiProperty = (property?: Swagger.Schema) =>
 (
 	// deno-lint-ignore ban-types
 	target: Object,
 	propertyKey: string | symbol,
 ) => {
+	MetadataHelper.setMetadata(API_PROPERTY, property ?? null, target, propertyKey);
 };
 
 export const OPTIONAL_KEY = 'optional';
