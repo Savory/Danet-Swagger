@@ -13,6 +13,7 @@ const spec = new SpecBuilder()
 	.addTag(tagName)
 	.addBasicAuth()
 	.addBearerAuth()
+	.addCookieAuth('wonderfulCookieName')
 	.addOAuth2()
 	.build();
 const swaggerPath = '/api';

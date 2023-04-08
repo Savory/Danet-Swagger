@@ -18,7 +18,8 @@ const expectedSpec = {
 			"basic":{"type":"http","scheme":"basic"},
 			"bearer":{"bearerFormat": "JWT","type":"http","scheme":"bearer"},
 			"oauth2": { "flows": { "implicit": { "scopes": {},},}, "type": "oauth2"},
-		},
+			"cookie": { "in": "cookie", "name": "wonderfulCookieName", "type": "apiKey"},
+},
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
@@ -185,6 +186,9 @@ const expectedSpec = {
 						},
 					},
 				},
+				'security': [{
+					'cookie': [],
+				}]
 			},
 			'put': {
 				'operationId': 'putSomething',
@@ -218,6 +222,7 @@ const spec = new SpecBuilder()
 	.addBasicAuth()
 	.addBearerAuth()
 	.addOAuth2()
+	.addCookieAuth('wonderfulCookieName')
 	.addTag(tagName)
 	.build();
 const document = await SwaggerModule.createDocument(app, spec) as any;

@@ -79,6 +79,7 @@ export const API_SECURITY_DATA = 'api-security-data';
 
 export const ApiBasicAuth = () => ApiSecurity('basic')
 export const ApiBearerAuth = () => ApiSecurity('bearer')
+export const ApiCookieAuth = () => ApiSecurity('cookie')
 export const ApiOAuth2 = (data: string[]) => ApiSecurity('oauth2', data)
 
 export const ApiSecurity = (name: string, data: string[] = []) =>

@@ -1,5 +1,5 @@
 import {
-	ApiBasicAuth, ApiBearerAuth, ApiOAuth2,
+	ApiBasicAuth, ApiBearerAuth, ApiCookieAuth, ApiOAuth2,
 	ApiProperty, ApiSecurity,
 	BodyType,
 	Optional,
@@ -116,6 +116,7 @@ class MyController {
 		return 1;
 	}
 
+	@ApiCookieAuth()
 	@ReturnedType(Boolean)
 	@Patch('somethingagain')
 	patchSomething(): boolean {
