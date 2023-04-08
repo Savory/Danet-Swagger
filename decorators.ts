@@ -75,19 +75,26 @@ export const Tag = (tagName: string) =>
 };
 
 export const API_SECURITY = 'api-security';
+export const API_SECURITY_DATA = 'api-security-data';
 
 export const ApiBasicAuth = () => ApiSecurity('basic')
-export const ApiBearerAuth = () => ApiSecurity('bearerAuth')
+export const ApiBearerAuth = () => ApiSecurity('bearer')
+export const ApiOAuth2 = (data: string[]) => ApiSecurity('oauth2', data)
 
-export const ApiSecurity = (security: string) =>
+export const ApiSecurity = (name: string, data: string[] = []) =>
 	(
 		// deno-lint-ignore ban-types
 		target: Object,
 		propertyKey?: string | symbol,
 		descriptor?: PropertyDescriptor,
 	) => {
-	if (propertyKey)
-		MetadataHelper.setMetadata(API_SECURITY, security, target, propertyKey);
-	else
-		MetadataHelper.setMetadata(API_SECURITY, security, target);
+		if (propertyKey) {
+			MetadataHelper.setMetadata(API_SECURITY, {
+				[name]: data
+			}, target, propertyKey);
+		} else {
+			MetadataHelper.setMetadata(API_SECURITY, {
+				[name]: data
+			}, target);
+		}
 	};

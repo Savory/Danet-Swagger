@@ -1,5 +1,5 @@
 import {
-	ApiBasicAuth, ApiBearerAuth,
+	ApiBasicAuth, ApiBearerAuth, ApiOAuth2,
 	ApiProperty, ApiSecurity,
 	BodyType,
 	Optional,
@@ -109,6 +109,7 @@ class MyController {
 		return [new Cat()];
 	}
 
+	@ApiOAuth2(['my-permission:all'])
 	@ReturnedType(Todo)
 	@Post()
 	postSomething(@Body() todo: Todo): number {

@@ -14,7 +14,11 @@ const expectedSpec = {
 	'servers': [],
 	'openapi': '3.0.3',
 	'components': {
-		"securitySchemes":{"basic":{"type":"http","scheme":"basic"}, "bearer":{"bearerFormat": "JWT","type":"http","scheme":"bearer"}},
+		"securitySchemes":{
+			"basic":{"type":"http","scheme":"basic"},
+			"bearer":{"bearerFormat": "JWT","type":"http","scheme":"bearer"},
+			"oauth2": { "flows": { "implicit": { "scopes": {},},}, "type": "oauth2"},
+		},
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
@@ -135,7 +139,7 @@ const expectedSpec = {
 					'schema': { 'type': 'number' },
 				}],
 				'security': [{
-					'bearerAuth': [],
+					'bearer': [],
 				}]
 			},
 			'post': {
@@ -161,6 +165,9 @@ const expectedSpec = {
 					'required': true,
 					'description': '',
 				},
+				'security': [{
+					'oauth2': ['my-permission:all'],
+				}]
 			},
 		},
 		'/my-endpoint/somethingagain': {
@@ -210,6 +217,7 @@ const spec = new SpecBuilder()
 	.setVersion(version)
 	.addBasicAuth()
 	.addBearerAuth()
+	.addOAuth2()
 	.addTag(tagName)
 	.build();
 const document = await SwaggerModule.createDocument(app, spec) as any;
