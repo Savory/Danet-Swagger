@@ -14,7 +14,7 @@ const expectedSpec = {
 	'servers': [],
 	'openapi': '3.0.3',
 	'components': {
-		"securitySchemes":{"basic":{"type":"http","scheme":"basic"}},
+		"securitySchemes":{"basic":{"type":"http","scheme":"basic"}, "bearer":{"bearerFormat": "JWT","type":"http","scheme":"bearer"}},
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
@@ -134,6 +134,9 @@ const expectedSpec = {
 					'required': false,
 					'schema': { 'type': 'number' },
 				}],
+				'security': [{
+					'bearerAuth': [],
+				}]
 			},
 			'post': {
 				'operationId': 'postSomething',
@@ -206,6 +209,7 @@ const spec = new SpecBuilder()
 	.setDescription(description)
 	.setVersion(version)
 	.addBasicAuth()
+	.addBearerAuth()
 	.addTag(tagName)
 	.build();
 const document = await SwaggerModule.createDocument(app, spec) as any;

@@ -1,5 +1,5 @@
 import {
-	ApiBasicAuth,
+	ApiBasicAuth, ApiBearerAuth,
 	ApiProperty, ApiSecurity,
 	BodyType,
 	Optional,
@@ -100,6 +100,8 @@ class HelloController {
 
 @Controller('my-endpoint')
 class MyController {
+
+	@ApiBearerAuth()
 	@ReturnedType(Cat, true)
 	@QueryType(CatSearch)
 	@Get()

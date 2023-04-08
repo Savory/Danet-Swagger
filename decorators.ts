@@ -77,6 +77,7 @@ export const Tag = (tagName: string) =>
 export const API_SECURITY = 'api-security';
 
 export const ApiBasicAuth = () => ApiSecurity('basic')
+export const ApiBearerAuth = () => ApiSecurity('bearerAuth')
 
 export const ApiSecurity = (security: string) =>
 	(
