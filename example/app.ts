@@ -13,14 +13,14 @@ import {
 	Patch,
 	Post,
 	Put,
-} from 'https://deno.land/x/danet@1.4.0/src/router/controller/decorator.ts';
+} from 'https://deno.land/x/danet/src/router/controller/decorator.ts';
 import {
 	Body,
 	Param,
 	Query,
-} from 'https://deno.land/x/danet@1.4.0/src/router/controller/params/decorators.ts';
-import { Module } from 'https://deno.land/x/danet@1.4.0/src/module/decorator.ts';
-import { DanetApplication } from 'https://deno.land/x/danet@1.4.0/src/app.ts';
+} from 'https://deno.land/x/danet/src/router/controller/params/decorators.ts';
+import { Module } from 'https://deno.land/x/danet/src/module/decorator.ts';
+import { DanetApplication } from 'https://deno.land/x/danet/src/app.ts';
 
 class Cat {
 	@ApiProperty()
