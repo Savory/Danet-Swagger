@@ -244,7 +244,7 @@ Deno.test('host swagger', async (ctx) => {
 		);
 		const text = await response.text();
 		assertEquals(response.status, 200);
-		assertEquals(text, swaggerHtml);
+		assertEquals(text, swaggerHtml.replace('%definition%', JSON.stringify(document)));
 		await app.close();
 	});
 	await ctx.step('serve swagger json file on given endpoint/json', async () => {
