@@ -236,7 +236,7 @@ export class SpecBuilder {
 		return this;
 	}
 
-	public build() {
+	public build(): Swagger.Spec {
 		return this.spec;
 	}
 }

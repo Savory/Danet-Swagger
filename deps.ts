@@ -1,6 +1,3 @@
-// const danetImport = '../Danet/';
-// const danetImport = 'https://deno.land/x/danet@1.3.0';
-
 export {
 	Body,
 	BODY_TYPE_KEY,
@@ -17,7 +14,7 @@ export {
 	Query,
 	QUERY_TYPE_KEY,
 	trimSlash,
-} from 'https://deno.land/x/danet/mod.ts';
-export { MetadataHelper } from 'https://deno.land/x/danet/src/metadata/mod.ts';
-export * as pathToRegexp from 'https://deno.land/x/path_to_regexp@v6.2.1/index.ts';
-export * as path from 'https://deno.land/std@0.167.0/path/mod.ts';
+} from '@danet/core';
+export { MetadataHelper } from '@danet/core/metadata';
+export { parse, type Token } from 'path_to_regexp';
+export * as path from '@std/path';

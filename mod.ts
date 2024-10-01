@@ -14,7 +14,7 @@ import { MethodDefiner } from './method-definer.ts';
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
 export class SwaggerModule {
-	static async createDocument(app: DanetApplication, spec: Swagger.Spec) {
+	static async createDocument(app: DanetApplication, spec: Swagger.Spec): Promise<Swagger.Spec> {
 		const definition = await this.generateModuleDefinition(app.entryModule);
 		spec.paths = definition.paths;
 		spec.components = {

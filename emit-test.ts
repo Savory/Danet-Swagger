@@ -1,4 +1,4 @@
-import { Reflect } from 'https://deno.land/x/deno_reflect@v0.2.1/mod.ts';
+import { Reflect } from 'deno_reflect/mod.ts';
 
 export const PrintIt = () =>
 (

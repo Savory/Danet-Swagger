@@ -10,7 +10,8 @@ import Schema = Swagger.Schema;
 import {
 	BODY_TYPE_KEY,
 	MetadataHelper,
-	pathToRegexp,
+	parse,
+	type Token,
 	QUERY_TYPE_KEY,
 	trimSlash,
 } from './deps.ts';
@@ -33,7 +34,7 @@ export class MethodDefiner {
 	private pathKey: string;
 	private readonly httpMethod: keyof Path;
 	private readonly pathUrl: string;
-	private pathTokens: pathToRegexp.Token[] = [];
+	private pathTokens: Token[] = [];
 	private containsUrlParams = false;
 	private schemas: { [key: string]: Schema } = {};
 	constructor(private Controller: Constructor, private methodName: string) {
@@ -194,7 +195,7 @@ export class MethodDefiner {
 
 	private getPathTokenAndTransformUrl(urlPath: string) {
 		let pathWithParams = '';
-		this.pathTokens = pathToRegexp.parse(urlPath);
+		this.pathTokens = parse(urlPath);
 		for (const item of this.pathTokens) {
 			if (typeof item === 'string') {
 				pathWithParams += item;

@@ -1,33 +1,48 @@
 {
-	"lint": {
-		"files": {
-			"exclude": ["spec"]
-		},
-		"rules": {
-			"tags": ["recommended"],
-			"include": ["ban-untagged-todo"],
-			"exclude": [
-				"no-unused-vars",
-				"no-explicit-any",
-				"no-namespace",
-				"ban-types"
-			]
-		}
-	},
-	"fmt": {
-		"options": {
-			"singleQuote": true,
-			"useTabs": true
-		},
-		"files": {
-			"exclude": ["*.md"]
-		}
-	},
-	"compilerOptions": {
-		"emitDecoratorMetadata": true
-	},
-	"tasks": {
-		"test": "deno test --unstable spec --allow-env --allow-read --allow-net",
-		"test:watch": "NO_LOG=true deno test --watch --allow-env --allow-net --unstable -A spec"
-	}
+  "name": "@danet/swagger",
+  "version": "2.1.0",
+  "exports": "./mod.ts",
+  "lint": {
+      "exclude": [
+        "spec"
+      ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-unused-vars",
+        "no-explicit-any",
+        "no-namespace",
+        "ban-types"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true,
+      "useTabs": true
+    },
+      "exclude": [
+        "*.md"
+      ]
+  },
+  "compilerOptions": {
+   "emitDecoratorMetadata": true,
+		"experimentalDecorators": true
+  },
+  "tasks": {
+    "test": "deno test --unstable spec --allow-env --allow-read --allow-net",
+    "test:watch": "NO_LOG=true deno test --watch --allow-env --allow-net --unstable -A spec"
+  },
+  "imports": {
+    "deno_reflect": "jsr:@dx/reflect@0.2.14",
+    "path_to_regexp": "npm:path-to-regexp@6.2.1",
+    "@std/path": "jsr:@std/path@1.0.6",
+    "@std/assert": "jsr:@std/assert@1.0.6",
+    "@danet/core": "jsr:@danet/core@2.4.1"
+  }
 }
