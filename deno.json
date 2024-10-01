@@ -1,7 +1,10 @@
 {
   "name": "@danet/swagger",
   "version": "2.1.0",
-  "exports": "./mod.ts",
+  "exports": {
+    ".":"./mod.ts",
+    "./decorators": "./decorators.ts"
+  },
   "lint": {
       "exclude": [
         "spec"
