@@ -11,9 +11,24 @@ import Schema = Swagger.Schema;
 import Path = Swagger.Path;
 import { MethodDefiner } from './method-definer.ts';
 
+/**
+ * Generic constructor type
+ */
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
+/**
+ * Responsible for generating and setting up Swagger documentation
+ * for a Danet application. It provides methods to create a Swagger document based on the application's
+ * modules and controllers, and to set up routes to serve the Swagger UI and JSON specification.
+ */
 export class SwaggerModule {
+	/**
+	 * Creates a Swagger document for the given Danet application.
+	 *
+	 * @param app - The Danet application instance.
+	 * @param spec - The initial Swagger specification object.
+	 * @returns A promise that resolves to the updated Swagger specification.
+	 */
 	static async createDocument(app: DanetApplication, spec: Swagger.Spec): Promise<Swagger.Spec> {
 		const definition = await this.generateModuleDefinition(app.entryModule);
 		spec.paths = definition.paths;
@@ -76,6 +91,20 @@ export class SwaggerModule {
 		return { paths, schemas };
 	}
 
+	/**
+	 * Sets up the API documentation routes for the given Danet application.
+	 *
+	 * @param apiPath - The base path for the API documentation.
+	 * @param app - The Danet application instance.
+	 * @param document - The Swagger specification document.
+	 *
+	 * This method registers two routes:
+	 * 1. `GET /{apiPath}`: Serves an HTML page displaying the API documentation.
+	 * 2. `GET /{apiPath}/json`: Serves the raw Swagger specification document in JSON format.
+	 *
+	 * The HTML page includes a script tag that loads the Swagger specification and a script from
+	 * a CDN to render the API documentation.
+	 */
 	static async setup(
 		apiPath: string,
 		app: DanetApplication,
