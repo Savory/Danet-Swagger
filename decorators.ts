@@ -1,3 +1,8 @@
+/**
+ * @module
+ * Provides decorators to define metadata to generate your openAPI/Swagger documentation.
+ */
+
 import { BODY_TYPE_KEY, MetadataHelper, QUERY_TYPE_KEY } from './deps.ts';
 import { Constructor } from './mod.ts';
 import { Swagger } from "./swagger.ts";

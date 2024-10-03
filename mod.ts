@@ -1,3 +1,8 @@
+/**
+ * @module
+ * SwaggerModule provides methods to generate and set up Swagger documentation for a Danet application.
+ */
+
 import {
 	DanetApplication,
 	MetadataHelper,

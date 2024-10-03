@@ -12,7 +12,10 @@
 [Danet](https://github.com/Savory/Danet).
 
 ## Quick Start
-
+```bash
+   deno install --global -A -n danet jsr:@danet/cli
+   danet new <my-project>
+```
 [Overview & Tutorial](https://savory.github.io/Danet/openapi/introduction/)
 
 ## License
