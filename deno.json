@@ -46,6 +46,9 @@
     "path_to_regexp": "npm:path-to-regexp@6.2.1",
     "@std/path": "jsr:@std/path@1.0.6",
     "@std/assert": "jsr:@std/assert@1.0.6",
-    "@danet/core": "jsr:@danet/core@2"
+    "@danet/core": "jsr:@danet/core@2",
+    "@danet/zod": "../danet-zod/decorators.ts",
+    "zod": "npm:zod@3.23.8",
+    "zod-openapi": "npm:@anatine/zod-openapi"
   }
 }

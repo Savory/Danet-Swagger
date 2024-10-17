@@ -16,6 +16,9 @@ import {
 	trimSlash,
 } from './deps.ts';
 import Parameter = Swagger.Parameter;
+import { zodQuerySchemaKey, zodBodySchemaKey } from '@danet/zod';
+import { ZodSchema } from 'npm:zod';
+import { generateSchema, type OpenApiZodAny } from 'zod-openapi';
 
 const primitiveTypes = [
 	'string',
@@ -177,6 +180,29 @@ export class MethodDefiner {
 					actualPath.parameters!.push(paramToAdd as Parameter);
 				}
 			});
+			return;
+		}
+		const zodSchema = MetadataHelper.getMetadata<ZodSchema>(
+			zodQuerySchemaKey,
+			this.Controller,
+			this.methodName
+		);
+		if (zodSchema) {
+			if (!actualPath.parameters) {
+				actualPath.parameters = [];
+			}
+			const openApiSchema = this.generateZodSchema(zodSchema);
+			Object.getOwnPropertyNames(openApiSchema.properties).forEach((propertyName) => {
+				const property = (openApiSchema.properties as any)![propertyName]!;
+				const paramToAdd: Partial<Parameter> = {
+					name: `${propertyName}`,
+					in: 'query',
+					description: '',
+					required: openApiSchema.required?.includes(propertyName),
+					schema: property
+				};
+				actualPath.parameters!.push(paramToAdd as Parameter);
+			});
 		}
 	}
 
@@ -277,10 +303,47 @@ export class MethodDefiner {
 				'$ref': `#/components/schemas/${bodyType.name}`,
 			}).setDescription('').get();
 			this.generateTypeSchema(bodyType);
+			return null;
+		}
+		const zodSchema = MetadataHelper.getMetadata<ZodSchema>(
+			zodBodySchemaKey,
+			this.Controller,
+			this.methodName
+		);
+		if (zodSchema) {
+			const openApiSchema = this.generateZodSchema(zodSchema);
+			actualPath.requestBody = new RequestBodyBuilder().jsonContent({
+				'$ref': `#/components/schemas/${openApiSchema.title}`,
+			}).setDescription('').get();
 		}
 		return null;
 	}
 
+	private generateZodSchema(zodSchema: OpenApiZodAny) {
+		const openApiSchema = generateSchema(zodSchema);
+		Object.getOwnPropertyNames(openApiSchema.properties).forEach((propertyName) => {
+			const property = structuredClone((openApiSchema.properties as any)![propertyName]!);
+
+			if (Object.hasOwn(property, 'properties') && Object.hasOwn(property, 'title')) {
+				let schemaTitle = property.title;
+				this.schemas = {
+					...this.schemas,
+					[schemaTitle]: property,
+				};
+				(openApiSchema.properties as any)![propertyName] = { "$ref": `#/components/schemas/${schemaTitle}` }
+			}
+		})
+		const schema: {
+			[key: string]: Swagger.Schema;
+		} = {
+			[openApiSchema.title!]: openApiSchema as any,
+		};
+		this.schemas = {
+			...this.schemas,
+			...schema,
+		};
+		return openApiSchema;
+	}
 	private generateTypeSchema(Type: Constructor<any>) {
 		const emptyInstance = Reflect.construct(Type, []);
 		const name = Type.name;
