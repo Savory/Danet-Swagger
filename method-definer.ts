@@ -16,10 +16,9 @@ import {
 	trimSlash,
 } from './deps.ts';
 import Parameter = Swagger.Parameter;
-import { zodQuerySchemaKey, zodBodySchemaKey } from '@danet/zod';
+import { zodQuerySchemaKey, zodBodySchemaKey, RETURNED_SCHEMA_KEY } from '@danet/zod';
 import { ZodSchema } from 'npm:zod';
 import { generateSchema, type OpenApiZodAny } from 'zod-openapi';
-import { RETURNED_SCHEMA_KEY } from '../danet-zod/decorators.ts';
 
 const primitiveTypes = [
 	'string',
