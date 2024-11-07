@@ -19,6 +19,7 @@ import Parameter = Swagger.Parameter;
 import { zodQuerySchemaKey, zodBodySchemaKey } from '@danet/zod';
 import { ZodSchema } from 'npm:zod';
 import { generateSchema, type OpenApiZodAny } from 'zod-openapi';
+import { RETURNED_SCHEMA_KEY } from '../danet-zod/decorators.ts';
 
 const primitiveTypes = [
 	'string',
@@ -251,14 +252,14 @@ export class MethodDefiner {
 	}
 
 	private addResponse(actualPath: Operation) {
-		const returnedValue = MetadataHelper.getMetadata(
+		let returnedValue = MetadataHelper.getMetadata<{
+			returnedType: Constructor;
+			isArray: boolean | undefined;
+		}>(
 			RETURNED_TYPE_KEY,
 			this.Controller.prototype,
 			this.methodName,
-		) as {
-			returnedType: Constructor;
-			isArray: boolean | undefined;
-		};
+		);
 		if (returnedValue) {
 			if (isPrimitive(returnedValue.returnedType.name.toLowerCase())) {
 				if (returnedValue.isArray) {
@@ -268,27 +269,53 @@ export class MethodDefiner {
 							type: returnedValue.returnedType.name.toLowerCase() as DataType,
 						},
 					}).setDescription('').get();
-				} else {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					return;
+				}
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						type: returnedValue.returnedType.name.toLowerCase() as DataType,
 					}).setDescription('').get();
-				}
-			} else {
-				if (returnedValue.isArray) {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
-						type: 'array',
-						items: {
-							'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-						},
-					}).setDescription('').get();
-				} else {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+				return;
+			}
+			if (returnedValue.isArray) {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					type: 'array',
+					items: {
 						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-					}).setDescription('').get();
-				}
-				this.generateTypeSchema(returnedValue.returnedType);
+					},
+				}).setDescription('').get();
+			} else {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
+				}).setDescription('').get();
+			}
+			this.generateTypeSchema(returnedValue.returnedType);
+			return;
+		}
+		const returnedSchema = MetadataHelper.getMetadata<{
+			returnedSchema: OpenApiZodAny;
+			isArray: boolean | undefined;
+		}>(
+			RETURNED_SCHEMA_KEY,
+			this.Controller.prototype,
+			this.methodName
+		);
+		console.log('returnedSchema', returnedSchema);
+		if (returnedSchema) {
+			const openApiSchema = this.generateZodSchema(returnedSchema.returnedSchema);
+			if (returnedSchema.isArray) {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					type: 'array',
+					items: {
+						'$ref': `#/components/schemas/${openApiSchema.title}`,
+					},
+				}).setDescription('').get();
+			} else {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					'$ref': `#/components/schemas/${openApiSchema.title}`,
+				}).setDescription('').get();
 			}
 		}
+
 		return null;
 	}
 

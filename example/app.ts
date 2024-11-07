@@ -21,7 +21,7 @@ import {
 } from '@danet/core';
 import { Module } from '@danet/core';
 import { DanetApplication } from '@danet/core';
-import { Query as ZodQuery, Body as ZodBody } from '@danet/zod';
+import { Query as ZodQuery, Body as ZodBody, ReturnedSchema } from '@danet/zod';
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
 
@@ -135,6 +135,12 @@ class ZodController {
 	@Post()
 	posZodSomething(@ZodBody(ZodTodo) todo: ZodTodo): number {
 		return 1;
+	}
+
+	@ReturnedSchema(ZodCat, true)
+	@Get()
+	getZodSomething() {
+		return [new Cat()]
 	}
 }
 

@@ -141,6 +141,24 @@ const expectedSpec = {
 					'description': '',
 				},
 			},
+			'get': {
+				'operationId': 'getZodSomething',
+				'responses': {
+					'200': {
+						'description': '',
+						'content': {
+							'application/json': {
+								'schema': {
+									'type': 'array',
+									'items': {
+										'$ref': '#/components/schemas/ZodCat',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		'/my-endpoint': {
 			'get': {

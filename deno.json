@@ -35,7 +35,7 @@
   },
   "compilerOptions": {
    "emitDecoratorMetadata": true,
-		"experimentalDecorators": true
+	"experimentalDecorators": true
   },
   "tasks": {
     "test": "deno test --unstable spec --allow-env --allow-read --allow-net",
