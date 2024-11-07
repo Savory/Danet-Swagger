@@ -16,6 +16,9 @@ import {
 	trimSlash,
 } from './deps.ts';
 import Parameter = Swagger.Parameter;
+import { zodQuerySchemaKey, zodBodySchemaKey, RETURNED_SCHEMA_KEY } from '@danet/zod';
+import { ZodSchema } from 'npm:zod';
+import { generateSchema, type OpenApiZodAny } from 'zod-openapi';
 
 const primitiveTypes = [
 	'string',
@@ -177,6 +180,29 @@ export class MethodDefiner {
 					actualPath.parameters!.push(paramToAdd as Parameter);
 				}
 			});
+			return;
+		}
+		const zodSchema = MetadataHelper.getMetadata<ZodSchema>(
+			zodQuerySchemaKey,
+			this.Controller,
+			this.methodName
+		);
+		if (zodSchema) {
+			if (!actualPath.parameters) {
+				actualPath.parameters = [];
+			}
+			const openApiSchema = this.generateZodSchema(zodSchema);
+			Object.getOwnPropertyNames(openApiSchema.properties).forEach((propertyName) => {
+				const property = (openApiSchema.properties as any)![propertyName]!;
+				const paramToAdd: Partial<Parameter> = {
+					name: `${propertyName}`,
+					in: 'query',
+					description: '',
+					required: openApiSchema.required?.includes(propertyName),
+					schema: property
+				};
+				actualPath.parameters!.push(paramToAdd as Parameter);
+			});
 		}
 	}
 
@@ -225,14 +251,14 @@ export class MethodDefiner {
 	}
 
 	private addResponse(actualPath: Operation) {
-		const returnedValue = MetadataHelper.getMetadata(
+		let returnedValue = MetadataHelper.getMetadata<{
+			returnedType: Constructor;
+			isArray: boolean | undefined;
+		}>(
 			RETURNED_TYPE_KEY,
 			this.Controller.prototype,
 			this.methodName,
-		) as {
-			returnedType: Constructor;
-			isArray: boolean | undefined;
-		};
+		);
 		if (returnedValue) {
 			if (isPrimitive(returnedValue.returnedType.name.toLowerCase())) {
 				if (returnedValue.isArray) {
@@ -242,27 +268,53 @@ export class MethodDefiner {
 							type: returnedValue.returnedType.name.toLowerCase() as DataType,
 						},
 					}).setDescription('').get();
-				} else {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					return;
+				}
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
 						type: returnedValue.returnedType.name.toLowerCase() as DataType,
 					}).setDescription('').get();
-				}
-			} else {
-				if (returnedValue.isArray) {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
-						type: 'array',
-						items: {
-							'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-						},
-					}).setDescription('').get();
-				} else {
-					actualPath.responses[200] = new ResponseBuilder().jsonContent({
+				return;
+			}
+			if (returnedValue.isArray) {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					type: 'array',
+					items: {
 						'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
-					}).setDescription('').get();
-				}
-				this.generateTypeSchema(returnedValue.returnedType);
+					},
+				}).setDescription('').get();
+			} else {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					'$ref': `#/components/schemas/${returnedValue.returnedType.name}`,
+				}).setDescription('').get();
+			}
+			this.generateTypeSchema(returnedValue.returnedType);
+			return;
+		}
+		const returnedSchema = MetadataHelper.getMetadata<{
+			returnedSchema: OpenApiZodAny;
+			isArray: boolean | undefined;
+		}>(
+			RETURNED_SCHEMA_KEY,
+			this.Controller.prototype,
+			this.methodName
+		);
+		console.log('returnedSchema', returnedSchema);
+		if (returnedSchema) {
+			const openApiSchema = this.generateZodSchema(returnedSchema.returnedSchema);
+			if (returnedSchema.isArray) {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					type: 'array',
+					items: {
+						'$ref': `#/components/schemas/${openApiSchema.title}`,
+					},
+				}).setDescription('').get();
+			} else {
+				actualPath.responses[200] = new ResponseBuilder().jsonContent({
+					'$ref': `#/components/schemas/${openApiSchema.title}`,
+				}).setDescription('').get();
 			}
 		}
+
 		return null;
 	}
 
@@ -277,10 +329,47 @@ export class MethodDefiner {
 				'$ref': `#/components/schemas/${bodyType.name}`,
 			}).setDescription('').get();
 			this.generateTypeSchema(bodyType);
+			return null;
+		}
+		const zodSchema = MetadataHelper.getMetadata<ZodSchema>(
+			zodBodySchemaKey,
+			this.Controller,
+			this.methodName
+		);
+		if (zodSchema) {
+			const openApiSchema = this.generateZodSchema(zodSchema);
+			actualPath.requestBody = new RequestBodyBuilder().jsonContent({
+				'$ref': `#/components/schemas/${openApiSchema.title}`,
+			}).setDescription('').get();
 		}
 		return null;
 	}
 
+	private generateZodSchema(zodSchema: OpenApiZodAny) {
+		const openApiSchema = generateSchema(zodSchema);
+		Object.getOwnPropertyNames(openApiSchema.properties).forEach((propertyName) => {
+			const property = structuredClone((openApiSchema.properties as any)![propertyName]!);
+
+			if (Object.hasOwn(property, 'properties') && Object.hasOwn(property, 'title')) {
+				let schemaTitle = property.title;
+				this.schemas = {
+					...this.schemas,
+					[schemaTitle]: property,
+				};
+				(openApiSchema.properties as any)![propertyName] = { "$ref": `#/components/schemas/${schemaTitle}` }
+			}
+		})
+		const schema: {
+			[key: string]: Swagger.Schema;
+		} = {
+			[openApiSchema.title!]: openApiSchema as any,
+		};
+		this.schemas = {
+			...this.schemas,
+			...schema,
+		};
+		return openApiSchema;
+	}
 	private generateTypeSchema(Type: Constructor<any>) {
 		const emptyInstance = Reflect.construct(Type, []);
 		const name = Type.name;

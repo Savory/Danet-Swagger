@@ -21,6 +21,23 @@ import {
 } from '@danet/core';
 import { Module } from '@danet/core';
 import { DanetApplication } from '@danet/core';
+import { Query as ZodQuery, Body as ZodBody, ReturnedSchema } from '@danet/zod';
+import { z } from 'zod';
+import { extendZodWithOpenApi } from 'zod-openapi';
+
+extendZodWithOpenApi(z);
+
+const ZodCat = z.object({
+	name: z.string(),
+	breed: z.string(),
+	dob: z.date(),
+	isHungry: z.boolean().optional(),
+	hobbies: z.array(z.any())
+}).openapi({
+	title: 'ZodCat'
+})
+
+type ZodCat = z.infer<typeof ZodCat>;
 
 class Cat {
 	@ApiProperty()
@@ -65,6 +82,17 @@ class CatSearch {
 	}
 }
 
+
+const ZodTodo = z.object({
+	title: z.string(),
+	description: z.string(),
+	version: z.number(),
+	cat: ZodCat,
+}).openapi({
+	title: 'ZodTodo'
+})
+
+type ZodTodo = z.infer<typeof ZodTodo>;
 class Todo {
 	@ApiProperty({
 		description: 'my description'
@@ -84,17 +112,35 @@ class Todo {
 	}
 }
 
-export class NameSearch {
-	@ApiProperty()
-	name!: string;
-}
+const NameSearch = z.object({
+	name: z.string(),
+}).openapi(
+	{
+		title: 'NameSearch'
+	}
+);
+
+type NameSearch = z.infer<typeof NameSearch>;
 
 @Controller('hello')
 class HelloController {
 	@Get()
-	@QueryType(NameSearch)
-	hello(@Query() search: NameSearch) {
+	hello(@ZodQuery(NameSearch) search: NameSearch) {
 		return `Hello ${search.name}`;
+	}
+}
+
+@Controller('zod')
+class ZodController {
+	@Post()
+	posZodSomething(@ZodBody(ZodTodo) todo: ZodTodo): number {
+		return 1;
+	}
+
+	@ReturnedSchema(ZodCat, true)
+	@Get()
+	getZodSomething() {
+		return [new Cat()]
 	}
 }
 
@@ -149,7 +195,7 @@ class SecondController {
 }
 
 @Module({
-	controllers: [SecondController, HelloController],
+	controllers: [SecondController, HelloController, ZodController],
 })
 class SecondModule {
 }

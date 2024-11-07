@@ -23,7 +23,9 @@ const expectedSpec = {
 		'schemas': {
 			'NameSearch': {
 				'required': ['name'],
-				'properties': { 'name': { 'type': 'string' } },
+				'properties': { 'name': { 'type': ['string'] } },
+				'type': ['object'],
+				'title': 'NameSearch',
 			},
 			'CatSearch': {
 				'required': ['name'],
@@ -52,6 +54,29 @@ const expectedSpec = {
 					'version': { 'type': 'number' },
 					'cat': { '$ref': '#/components/schemas/Cat' },
 				},
+			},
+			'ZodCat': {
+				'required': ['name', 'breed', 'dob', 'hobbies'],
+				'properties': {
+					'name': { 'type': ['string'] },
+					'breed': { 'type': ['string'] },
+					'dob': { 'type': ['string'], 'format': 'date-time' },
+					'isHungry': { 'type': ['boolean'] },
+					'hobbies': { items: {}, 'type': ['array'] },
+				},
+				title: 'ZodCat',
+				type: [ 'object' ]
+			},
+			'ZodTodo': {
+				'required': ['title', 'description', 'version', 'cat'],
+				'properties': {
+					'title': { 'type': ['string'] },
+					'description': { 'type': ['string'] },
+					'version': { 'type': ['number'] },
+					'cat': { '$ref': '#/components/schemas/ZodCat' },
+				},
+				title: 'ZodTodo',
+				type: [ 'object' ]
 			},
 		},
 	},
@@ -98,8 +123,41 @@ const expectedSpec = {
 					'in': 'query',
 					'description': '',
 					'required': true,
-					'schema': { 'type': 'string' },
+					'schema': { 'type': ['string'] },
 				}],
+			},
+		},
+		'/zod': {
+			'post': {
+				'operationId': 'posZodSomething',
+				'responses': { '200': { 'description': '' } },
+				'requestBody': {
+					'content': {
+						'application/json': {
+							'schema': { '$ref': '#/components/schemas/ZodTodo' },
+						},
+					},
+					'required': true,
+					'description': '',
+				},
+			},
+			'get': {
+				'operationId': 'getZodSomething',
+				'responses': {
+					'200': {
+						'description': '',
+						'content': {
+							'application/json': {
+								'schema': {
+									'type': 'array',
+									'items': {
+										'$ref': '#/components/schemas/ZodCat',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 		'/my-endpoint': {
