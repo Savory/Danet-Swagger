@@ -49,6 +49,6 @@
     "@danet/core": "jsr:@danet/core@2",
     "@danet/zod": "jsr:@danet/zod@0.0.7",
     "zod": "npm:zod@3.23.8",
-    "zod-openapi": "npm:@anatine/zod-openapi"
+    "zod-openapi": "npm:@anatine/zod-openapi@2.2.6"
   }
 }

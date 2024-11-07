@@ -17,7 +17,7 @@ import {
 } from './deps.ts';
 import Parameter = Swagger.Parameter;
 import { zodQuerySchemaKey, zodBodySchemaKey, RETURNED_SCHEMA_KEY } from '@danet/zod';
-import { ZodSchema } from 'npm:zod';
+import { ZodSchema } from 'zod';
 import { generateSchema, type OpenApiZodAny } from 'zod-openapi';
 
 const primitiveTypes = [
