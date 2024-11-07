@@ -1,6 +1,6 @@
 {
   "name": "@danet/swagger",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "exports": {
     ".":"./mod.ts",
     "./decorators": "./decorators.ts"
@@ -47,7 +47,7 @@
     "@std/path": "jsr:@std/path@1.0.6",
     "@std/assert": "jsr:@std/assert@1.0.6",
     "@danet/core": "jsr:@danet/core@2",
-    "@danet/zod": "../danet-zod/decorators.ts",
+    "@danet/zod": "jsr:@danet/zod@0.0.7",
     "zod": "npm:zod@3.23.8",
     "zod-openapi": "npm:@anatine/zod-openapi"
   }
