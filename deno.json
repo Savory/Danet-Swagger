@@ -1,6 +1,6 @@
 {
   "name": "@danet/swagger",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "exports": {
     ".":"./mod.ts",
     "./decorators": "./decorators.ts"

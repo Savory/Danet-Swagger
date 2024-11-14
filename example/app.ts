@@ -133,7 +133,7 @@ class HelloController {
 @Controller('zod')
 class ZodController {
 	@Post()
-	posZodSomething(@ZodBody(ZodTodo) todo: ZodTodo): number {
+	posZodSomething(@ZodBody(ZodTodo) todo: ZodTodo) {
 		return 1;
 	}
 
@@ -156,10 +156,9 @@ class MyController {
 	}
 
 	@ApiOAuth2(['my-permission:all'])
-	@ReturnedType(Todo)
 	@Post()
-	postSomething(@Body() todo: Todo): number {
-		return 1;
+	postSomething(@Body() todo: Todo): Todo {
+		return new Todo();
 	}
 
 	@ApiCookieAuth()
@@ -171,7 +170,7 @@ class MyController {
 
 	@BodyType(Todo)
 	@Put('somethingagain')
-	putSomething(): Todo {
+	putSomething() {
 		return new Todo();
 	}
 }

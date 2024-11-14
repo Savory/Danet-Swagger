@@ -259,6 +259,19 @@ export class MethodDefiner {
 			this.Controller.prototype,
 			this.methodName,
 		);
+		if (!returnedValue) {
+			const returnedType = MetadataHelper.getMetadata<Constructor>(
+				'design:returntype',
+				this.Controller.prototype,
+				this.methodName,
+			);
+			if (returnedType) {
+				returnedValue = {
+					returnedType,
+					isArray: false,
+				};
+			}
+		}
 		if (returnedValue) {
 			if (isPrimitive(returnedValue.returnedType.name.toLowerCase())) {
 				if (returnedValue.isArray) {
@@ -298,7 +311,6 @@ export class MethodDefiner {
 			this.Controller.prototype,
 			this.methodName
 		);
-		console.log('returnedSchema', returnedSchema);
 		if (returnedSchema) {
 			const openApiSchema = this.generateZodSchema(returnedSchema.returnedSchema);
 			if (returnedSchema.isArray) {
@@ -313,6 +325,7 @@ export class MethodDefiner {
 					'$ref': `#/components/schemas/${openApiSchema.title}`,
 				}).setDescription('').get();
 			}
+			return;
 		}
 
 		return null;

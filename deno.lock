@@ -14,7 +14,7 @@
     "jsr:@std/internal@^1.0.4": "1.0.5",
     "jsr:@std/path@1.0.6": "1.0.6",
     "jsr:@std/path@^1.0.6": "1.0.6",
-    "npm:@anatine/zod-openapi@*": "2.2.6_openapi3-ts@4.4.0_zod@3.23.8",
+    "npm:@anatine/zod-openapi@2.2.6": "2.2.6_openapi3-ts@4.4.0_zod@3.23.8",
     "npm:awesome-phonenumber@7.1.0": "7.1.0",
     "npm:handlebars@4.7.7": "4.7.7",
     "npm:path-to-regexp@6.2.1": "6.2.1",
@@ -792,7 +792,7 @@
       "jsr:@dx/reflect@0.2.14",
       "jsr:@std/assert@1.0.6",
       "jsr:@std/path@1.0.6",
-      "npm:@anatine/zod-openapi@*",
+      "npm:@anatine/zod-openapi@2.2.6",
       "npm:path-to-regexp@6.2.1",
       "npm:zod@3.23.8"
     ]
