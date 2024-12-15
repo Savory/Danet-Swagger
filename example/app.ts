@@ -2,6 +2,7 @@ import {
 	ApiBasicAuth, ApiBearerAuth, ApiCookieAuth, ApiOAuth2,
 	ApiProperty, ApiSecurity,
 	BodyType,
+	Description,
 	Optional,
 	QueryType,
 	ReturnedType,
@@ -181,6 +182,7 @@ class MyController {
 @Tag('second')
 @Controller('second-endpoint')
 class SecondController {
+	@Description("Get Second Description")
 	@ApiSecurity('basic')
 	@Get()
 	getSecond() {

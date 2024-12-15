@@ -162,6 +162,44 @@ return (
 }
 
 /**
+ * A constant key used to store or retrieve description metadata.
+ * This key is typically used in decorators to annotate
+ * classes or methods with specific description for documentation.
+ */
+export const DESCRIPTION_KEY = 'description';
+
+/**
+ * A decorator function to add an openAPI description to a class or a method.
+ *
+ * @param description - The description.
+ *
+ * @example
+ * ```typescript
+ * class ExampleClass {
+ *   @Description('My very cool description')
+ *   exampleMethod() {
+ *     // method implementation
+ *   }
+ * }
+ * ```
+ */
+export function Description(description: string) : DecoratorFunction {
+	return (
+		target: Object,
+		propertyKey?: string | symbol,
+		descriptor?: PropertyDescriptor,
+	) => {
+		if (propertyKey) {
+			MetadataHelper.setMetadata(DESCRIPTION_KEY, description, target, propertyKey);
+		} else {
+			MetadataHelper.setMetadata(DESCRIPTION_KEY, description, target);
+		}
+	};
+	}
+
+
+
+/**
  * A constant key used to store or retrieve api-security metadata.
  */
 export const API_SECURITY = 'api-security';

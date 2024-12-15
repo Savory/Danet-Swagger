@@ -84,6 +84,7 @@ const expectedSpec = {
 		'/second-endpoint': {
 			'get': {
 				'operationId': 'getSecond',
+				'description': "Get Second Description",
 				'responses': { '200': { 'description': '' } },
 				'tags': ['second'],
 				'security': [{
