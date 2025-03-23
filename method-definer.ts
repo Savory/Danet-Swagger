@@ -271,7 +271,15 @@ export class MethodDefiner {
 			this.Controller.prototype,
 			this.methodName,
 		);
-		if (!returnedValue) {
+		const returnedSchema = MetadataHelper.getMetadata<{
+			returnedSchema: OpenApiZodAny;
+			isArray: boolean | undefined;
+		}>(
+			RETURNED_SCHEMA_KEY,
+			this.Controller.prototype,
+			this.methodName
+		);
+		if (!returnedValue && !returnedSchema) {
 			const returnedType = MetadataHelper.getMetadata<Constructor>(
 				'design:returntype',
 				this.Controller.prototype,
@@ -315,14 +323,7 @@ export class MethodDefiner {
 			this.generateTypeSchema(returnedValue.returnedType);
 			return;
 		}
-		const returnedSchema = MetadataHelper.getMetadata<{
-			returnedSchema: OpenApiZodAny;
-			isArray: boolean | undefined;
-		}>(
-			RETURNED_SCHEMA_KEY,
-			this.Controller.prototype,
-			this.methodName
-		);
+
 		if (returnedSchema) {
 			const openApiSchema = this.generateZodSchema(returnedSchema.returnedSchema);
 			if (returnedSchema.isArray) {
